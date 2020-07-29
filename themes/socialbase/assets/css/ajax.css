@@ -3,18 +3,22 @@
  */
 @-webkit-keyframes glyphicon-spin {
   0% {
-    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
   }
   100% {
-    transform: rotate(359deg);
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
   }
 }
 @keyframes glyphicon-spin {
   0% {
-    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
   }
   100% {
-    transform: rotate(359deg);
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
   }
 }
 
@@ -37,6 +41,7 @@ html.js .btn .ajax-throbber {
 html.js .input-group-addon .glyphicon {
   color: #777777;
   opacity: .5;
+  -webkit-transition: 150ms color, 150ms opacity;
   transition: 150ms color, 150ms opacity;
 }
 

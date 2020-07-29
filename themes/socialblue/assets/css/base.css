@@ -263,14 +263,14 @@ a.brand-secondary:focus {
 .brand-accent {
   background-color: #ffc142;
   border-color: #ffc142;
-  color: #4a4a4a;
+  color: #4d4d4d;
 }
 
 a.brand-accent:hover,
 a.brand-accent:focus {
   background-color: #ffb00f;
   border-color: #ffb00f;
-  color: #4a4a4a;
+  color: #4d4d4d;
 }
 
 .brand-user {
@@ -289,14 +289,14 @@ a.brand-user:focus {
 .default-light {
   background-color: #e6e6e6;
   border-color: #e6e6e6;
-  color: #4a4a4a;
+  color: #4d4d4d;
 }
 
 a.default-light:hover,
 a.default-light:focus {
   background-color: #cdcdcd;
   border-color: #cdcdcd;
-  color: #4a4a4a;
+  color: #4d4d4d;
 }
 
 body {
@@ -304,7 +304,7 @@ body {
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #4a4a4a;
+  color: #4d4d4d;
   background-color: #f3f3f3;
 }
 
@@ -474,22 +474,8 @@ body {
   fill: #29abe2;
 }
 
-.table .views-field-link-flag > .btn {
-  min-width: 150px;
-}
-
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #f6f6f6;
-}
-
 .img-avatar,
 .avatar img,
 .avatar-icon {
   border-radius: 50%;
-}
-
-@media (max-width: 599px) {
-  .table-responsive {
-    margin-bottom: 0;
-  }
 }

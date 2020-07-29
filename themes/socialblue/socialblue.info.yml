@@ -10,15 +10,6 @@ core: 8.x
 libraries:
   - socialblue/brand
   - socialblue/site-footer
-  # Atoms
-  - socialblue/cards--sky
-  # Molecules
-  - socialblue/navbar--sky
-  - socialblue/resource-search
-  - socialblue/paragraphs
-  # Templates
-  - socialblue/layout--sky
-  - socialblue/forum
 
 libraries-extend:
   socialbase/base:
@@ -45,7 +36,7 @@ libraries-extend:
   socialbase/dropdown:
     - socialblue/dropdown
   socialbase/file:
-    - socialblue/file
+      - socialblue/file
   socialbase/form-elements:
     - socialblue/form-elements
   socialbase/form--input-groups:
@@ -81,8 +72,6 @@ libraries-extend:
     - socialblue/comment
   socialbase/hero:
     - socialblue/hero
-  socialbase/hero--sky:
-    - socialblue/hero--sky
   socialbase/message:
     - socialblue/message
   socialbase/meta:

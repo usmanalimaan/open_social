@@ -145,10 +145,6 @@
 
 }
 
-.region--complementary_wrapper.card {
-  background: transparent;
-}
-
 .layout--with-two-columns {
 
   .region--content,
@@ -207,14 +203,6 @@
 
   }
 
-}
-
-body:not(.socialblue--sky) {
-  .content--side_wrapper-card.card,
-  .region--complementary_wrapper.card {
-    box-shadow: none;
-    background: transparent;
-  }
 }
 
 

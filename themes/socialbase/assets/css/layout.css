@@ -54,10 +54,6 @@
   max-width: 100%;
 }
 
-.region--complementary_wrapper.card {
-  background: transparent;
-}
-
 .layout--with-two-columns .region--content,
 .layout--with-two-columns .region--sidebar-first,
 .layout--with-two-columns .region--sidebar-second {
@@ -74,13 +70,6 @@
   padding-right: 1em;
   -ms-flex-preferred-size: 100%;
       flex-basis: 100%;
-}
-
-body:not(.socialblue--sky) .content--side_wrapper-card.card,
-body:not(.socialblue--sky) .region--complementary_wrapper.card {
-  -webkit-box-shadow: none;
-          box-shadow: none;
-  background: transparent;
 }
 
 .region--complementary-bottom {

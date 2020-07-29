@@ -5,14 +5,6 @@
   border-radius: 5px;
 }
 
-.socialblue--sky .form-control--autogrow {
-  height: 35px;
-}
-
-.socialblue--sky .form-control[name='search_input'] {
-  height: 38px;
-}
-
 .form-control:focus {
   border-color: #29abe2;
   outline: 0;

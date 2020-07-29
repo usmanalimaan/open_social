@@ -1,13 +1,16 @@
 .toolbar-vertical #block-filter:target {
-  transform: translateY(39px) translateX(0);
+  -webkit-transform: translateY(39px) translateX(0);
+          transform: translateY(39px) translateX(0);
 }
 
 .toolbar-vertical .off-canvas-right {
-  transform: translateY(39px) translateX(280px);
+  -webkit-transform: translateY(39px) translateX(280px);
+          transform: translateY(39px) translateX(280px);
 }
 
 .toolbar-vertical .off-canvas-right.is-open {
-  transform: translateY(39px) translateX(0);
+  -webkit-transform: translateY(39px) translateX(0);
+          transform: translateY(39px) translateX(0);
 }
 
 .toolbar-vertical .navbar-default,
@@ -27,9 +30,11 @@
 
 @media (min-width: 900px) {
   .toolbar-vertical .off-canvas-right {
-    transform: none;
+    -webkit-transform: none;
+            transform: none;
   }
   .toolbar-vertical .off-canvas-right.is-open {
-    transform: none;
+    -webkit-transform: none;
+            transform: none;
   }
 }

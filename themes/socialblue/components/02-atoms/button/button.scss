@@ -77,64 +77,6 @@
     border-radius: 50%;
   }
 
-  .socialblue--sky & {
-    &:not(.btn-icon-toggle) {
-      padding-left: 15px;
-      padding-right: 15px;
-      border-width: 1px;
-      font-weight: 700;
-
-      &.btn-floating {
-        border-radius: 50%;
-        padding: 7px;
-      }
-    }
-  }
-}
-
-.socialblue--sky {
-  .card__link .btn-default,
-  .card__link.btn-default {
-    border-width: $border-radius-extra;
-
-    a {
-      font-weight: 700;
-    }
-  }
-
-  .table .views-field-link-flag {
-    .btn {
-      padding: 5px 10px;
-      font-weight: normal;
-    }
-  }
-
-  .block-group-add-event-block,
-  .block-group-add-topic-block,
-  .block-event-add-block,
-  .block-topic-add-block,
-  .block-group-add-block,
-  .block-discussion-add-block,
-  .block-group-add-discussion-block,
-  .block-group-add-idea-block {
-    width: 100%;
-    margin: 0 auto;
-    text-align: center;
-    padding: 1rem 1.875rem;
-
-    @include for-tablet-portrait-up {
-      padding: 1.25rem 2.25rem;
-    }
-
-    .btn {
-      width: 100%;
-      margin-bottom: 0;
-
-      @include for-phone-only {
-        width: 100%;
-      }
-    }
-  }
 }
 
 .btn-default {

@@ -7,7 +7,7 @@
 }
 
 .card__title {
-  color: #777;
+  color: #555555;
   font-weight: 500;
 }
 
@@ -21,7 +21,7 @@
 
 .block--custom-content-list .card__title .content-list__type {
   display: none;
-  /* temporary styles */
+  /* temporary style */
   width: 14px;
   height: 14px;
   margin-right: 1rem;

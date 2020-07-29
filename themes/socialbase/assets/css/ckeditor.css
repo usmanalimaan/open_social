@@ -14,7 +14,8 @@ kbd kbd {
   padding: 0;
   font-size: 100%;
   font-weight: bold;
-  box-shadow: none;
+  -webkit-box-shadow: none;
+          box-shadow: none;
 }
 
 pre {
@@ -37,7 +38,8 @@ pre code {
 }
 
 *, *:before, *:after {
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 html {
@@ -62,6 +64,7 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 500;
   line-height: 1.1;
   margin: 1rem 0 0.5rem;
+  -webkit-transition: 0.3s;
   transition: 0.3s;
 }
 
@@ -429,7 +432,7 @@ th {
   height: 20px;
 }
 
-.tabledrag-handle {
+form:not(.layout-builder-add-block) .tabledrag-handle {
   color: #777777;
   cursor: move;
   position: absolute;
@@ -438,7 +441,7 @@ th {
   padding: 10px;
 }
 
-.tabledrag-handle ~ .form-managed-file {
+form:not(.layout-builder-add-block) .tabledrag-handle ~ .form-managed-file {
   display: block;
   padding-left: 24px;
 }
@@ -456,6 +459,10 @@ th {
   margin-right: auto;
 }
 
+.view-group-manage-members {
+  padding: 0 10px;
+}
+
 .select-all.checkbox,
 form:not(.layout-builder-configure-block) .select-all.checkbox {
   display: table-cell;
@@ -470,7 +477,9 @@ form:not(.layout-builder-configure-block) .select-all.checkbox {
 }
 
 .vbo-table .btn-group--operations {
-  justify-content: left;
+  -webkit-box-pack: left;
+      -ms-flex-pack: left;
+          justify-content: left;
 }
 
 .vbo-table .form-no-label.checkbox label {
@@ -487,6 +496,7 @@ form:not(.layout-builder-configure-block) .select-all.checkbox {
   font-weight: normal;
   text-align: center;
   vertical-align: middle;
+  -ms-touch-action: manipulation;
   touch-action: manipulation;
   cursor: pointer;
   background-image: none;
@@ -499,6 +509,7 @@ form:not(.layout-builder-configure-block) .select-all.checkbox {
   -ms-user-select: none;
   user-select: none;
   text-transform: uppercase;
+  -webkit-transition: .3s ease-out;
   transition: .3s ease-out;
   outline: 0;
 }
@@ -837,7 +848,8 @@ sub {
 }
 
 .align-center {
-  align-self: center;
+  -ms-flex-item-align: center;
+      align-self: center;
 }
 
 .block {
@@ -868,7 +880,8 @@ sub {
 
 .img-elevated {
   display: inline-block;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
+  -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
+          box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
 }
 
 p + p .img-elevated {
@@ -908,8 +921,11 @@ img.align-center {
 }
 
 .img-grid {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   padding-bottom: 10px;
 }
 
@@ -1003,7 +1019,8 @@ img.align-center {
   font-weight: normal;
   text-align: center;
   vertical-align: middle;
-  touch-action: manipulation;
+  -ms-touch-action: manipulation;
+      touch-action: manipulation;
   cursor: pointer;
   background-image: none;
   border: 1px solid transparent;
@@ -1014,6 +1031,7 @@ img.align-center {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+  -webkit-transition: .3s ease-out;
   transition: .3s ease-out;
   outline: 0;
 }
@@ -1043,7 +1061,8 @@ img.align-center {
 fieldset[disabled] .btn {
   cursor: not-allowed;
   opacity: .65;
-  box-shadow: none;
+  -webkit-box-shadow: none;
+          box-shadow: none;
 }
 
 .btn a {
@@ -1070,7 +1089,8 @@ a.btn {
 fieldset[disabled] .btn-link {
   background-color: transparent;
   border-color: transparent;
-  box-shadow: none;
+  -webkit-box-shadow: none;
+          box-shadow: none;
 }
 
 .btn-link[disabled]:hover, .btn-link[disabled]:focus,
@@ -1149,16 +1169,22 @@ input[type="button"].btn-block {
 }
 
 .btn-raised {
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+  -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+          box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+  -webkit-transition: .15s ease-out, -webkit-box-shadow;
+  transition: .15s ease-out, -webkit-box-shadow;
   transition: box-shadow, .15s ease-out;
+  transition: box-shadow, .15s ease-out, -webkit-box-shadow;
 }
 
 .btn-raised:active, .btn-raised.active, .btn-raised:hover {
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
+  -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
+          box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
 }
 
 .btn-raised.disabled, .btn-raised[disabled] {
-  box-shadow: 0 -1px 0 #e0e0e0, 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+  -webkit-box-shadow: 0 -1px 0 #e0e0e0, 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+          box-shadow: 0 -1px 0 #e0e0e0, 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
 }
 
 .btn-icon-toggle {
@@ -1202,11 +1228,13 @@ input[type="button"].btn-block {
   padding: 7px;
   border-radius: 50%;
   border: 0;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
+  -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
+          box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
 }
 
 .btn-floating:active, .btn-floating.active, .btn-floating:hover {
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
+  -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
+          box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
 }
 
 .btn-floating.btn-lg, .btn-group-lg > .btn-floating.btn {
@@ -1215,7 +1243,8 @@ input[type="button"].btn-block {
 }
 
 .btn-floating.disabled, .btn-floating[disabled] {
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
+  -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
+          box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
 }
 
 .btn-group,
@@ -1335,7 +1364,8 @@ input[type="button"].btn-block {
 }
 
 .btn-group.open .dropdown-toggle.btn-link {
-  box-shadow: none;
+  -webkit-box-shadow: none;
+          box-shadow: none;
 }
 
 .btn-lg .caret, .btn-group-lg > .btn .caret {
@@ -1378,8 +1408,12 @@ input[type="button"].btn-block {
 
 .btn-group--operations {
   width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
 }
 
 .block-group-add-event-block,
@@ -1467,6 +1501,12 @@ body {
   }
 }
 
+@media (min-width: 1200px) {
+  .view-group-manage-members {
+    padding: 0;
+  }
+}
+
 @media (max-width: 599px) {
   figure.align-left, figure.align-right, figure.align-center {
     float: none;
@@ -1489,9 +1529,6 @@ body {
   }
   .right-auto {
     margin-left: 0.5rem;
-  }
-  .view-group-manage-members {
-    padding: 0 10px;
   }
   .view-group-manage-members .form-group-inline--right {
     display: block;

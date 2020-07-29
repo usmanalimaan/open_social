@@ -6,71 +6,18 @@
   border-radius: 50%;
 }
 
-.socialblue--sky .btn:not(.btn-icon-toggle) {
-  padding-left: 15px;
-  padding-right: 15px;
-  border-width: 1px;
-  font-weight: 700;
-}
-
-.socialblue--sky .btn:not(.btn-icon-toggle).btn-floating {
-  border-radius: 50%;
-  padding: 7px;
-}
-
-.socialblue--sky .card__link .btn-default,
-.socialblue--sky .card__link.btn-default {
-  border-width: 2px;
-}
-
-.socialblue--sky .card__link .btn-default a,
-.socialblue--sky .card__link.btn-default a {
-  font-weight: 700;
-}
-
-.socialblue--sky .table .views-field-link-flag .btn {
-  padding: 5px 10px;
-  font-weight: normal;
-}
-
-.socialblue--sky .block-group-add-event-block,
-.socialblue--sky .block-group-add-topic-block,
-.socialblue--sky .block-event-add-block,
-.socialblue--sky .block-topic-add-block,
-.socialblue--sky .block-group-add-block,
-.socialblue--sky .block-discussion-add-block,
-.socialblue--sky .block-group-add-discussion-block,
-.socialblue--sky .block-group-add-idea-block {
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  padding: 1rem 1.875rem;
-}
-
-.socialblue--sky .block-group-add-event-block .btn,
-.socialblue--sky .block-group-add-topic-block .btn,
-.socialblue--sky .block-event-add-block .btn,
-.socialblue--sky .block-topic-add-block .btn,
-.socialblue--sky .block-group-add-block .btn,
-.socialblue--sky .block-discussion-add-block .btn,
-.socialblue--sky .block-group-add-discussion-block .btn,
-.socialblue--sky .block-group-add-idea-block .btn {
-  width: 100%;
-  margin-bottom: 0;
-}
-
 .btn-default {
-  color: #4a4a4a;
+  color: #4d4d4d;
   background-color: #ffffff;
   border-color: #adadad;
-  fill: #4a4a4a;
+  fill: #4d4d4d;
 }
 
 .btn-default:focus, .btn-default.focus, .btn-default:hover, .btn-default:active, .btn-default.active,
 .open > .btn-default.dropdown-toggle {
   background-color: #e6e6e6;
   border-color: #8e8e8e;
-  color: #4a4a4a;
+  color: #4d4d4d;
 }
 
 .btn-default.disabled:hover, .btn-default.disabled:focus, .btn-default.disabled.focus, .btn-default[disabled]:hover, .btn-default[disabled]:focus, .btn-default[disabled].focus,
@@ -222,7 +169,7 @@ fieldset[disabled]
 
 .btn-flat:hover .icon-inline, .btn-flat:focus .icon-inline,
 .open .dropdown-toggle .btn-flat .icon-inline {
-  fill: #4a4a4a;
+  fill: #4d4d4d;
 }
 
 .btn-flat:active, .btn-flat.active {
@@ -365,30 +312,4 @@ fieldset[disabled] .btn--twitter.focus {
 
 .shariff-button {
   border-radius: 10px;
-}
-
-@media (min-width: 600px) {
-  .socialblue--sky .block-group-add-event-block,
-  .socialblue--sky .block-group-add-topic-block,
-  .socialblue--sky .block-event-add-block,
-  .socialblue--sky .block-topic-add-block,
-  .socialblue--sky .block-group-add-block,
-  .socialblue--sky .block-discussion-add-block,
-  .socialblue--sky .block-group-add-discussion-block,
-  .socialblue--sky .block-group-add-idea-block {
-    padding: 1.25rem 2.25rem;
-  }
-}
-
-@media (max-width: 599px) {
-  .socialblue--sky .block-group-add-event-block .btn,
-  .socialblue--sky .block-group-add-topic-block .btn,
-  .socialblue--sky .block-event-add-block .btn,
-  .socialblue--sky .block-topic-add-block .btn,
-  .socialblue--sky .block-group-add-block .btn,
-  .socialblue--sky .block-discussion-add-block .btn,
-  .socialblue--sky .block-group-add-discussion-block .btn,
-  .socialblue--sky .block-group-add-idea-block .btn {
-    width: 100%;
-  }
 }

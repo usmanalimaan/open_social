@@ -22,30 +22,15 @@
 
 }
 .dropdown {
-  &.has-alert {
-    > a {
-      @include for-phone-only {
-        &:before {
-          background-color: $brand-accent;
-        }
-      }
+  @include for-phone-only {
+    &.has-alert > a:before {
+      background-color: $brand-accent;
     }
   }
-}
 
-// Behaviors arrow on the dropdown menu
-.socialblue--sky {
-  .dropdown.open .caret,
-  .enroll-action-form.open .caret,
-  .hero-footer__cta .open .caret,
-  .social-gtranslate-list--desktop.open > a:after {
-    transform: rotate(180deg);
-  }
-
-  .social-gtranslate-list--desktop.open {
-    > a:after {
-      margin-top: -.4rem;
-      right: auto;
-    }
+  // There are now items that don't have their own top level icon so these
+  // should show notifications in the user menu also on desktop.
+  &.has-alert.has-alert--desktop > a:before {
+    background-color: $brand-accent;
   }
 }
