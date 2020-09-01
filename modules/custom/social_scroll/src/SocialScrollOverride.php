@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Class SocialScrollOverride.
@@ -29,16 +30,26 @@ class SocialScrollOverride implements ConfigFactoryOverrideInterface {
   protected $socialScrollManager;
 
   /**
+   * The route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
    * Constructs the configuration override.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    * @param \Drupal\social_scroll\SocialScrollManagerInterface $social_scroll_manager
    *   The SocialScrollManager manager.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, SocialScrollManagerInterface $social_scroll_manager) {
+  public function __construct(ConfigFactoryInterface $config_factory, SocialScrollManagerInterface $social_scroll_manager, RouteMatchInterface $route_match) {
     $this->configFactory = $config_factory;
     $this->socialScrollManager = $social_scroll_manager;
+    $this->routeMatch = $route_match;
   }
 
   /**
@@ -67,20 +78,22 @@ class SocialScrollOverride implements ConfigFactoryOverrideInterface {
           }
         }
 
-        foreach ($pages as $display_page) {
-          $display_options = $current_view->getOriginal('display.' . $display_page . '.display_options');
-          $overrides[$config_name]['display'][$display_page]['display_options'] = array_merge($display_options, [
-            'pager' => [
-              'type' => 'infinite_scroll',
-              'options' => [
-                'views_infinite_scroll' => [
-                  'button_text' => $button_text,
-                  'automatically_load_content' => $automatically_load_content,
+        if ($this->routeMatch->getRouteName() !== 'view.group_information.page_group_about') {
+          foreach ($pages as $display_page) {
+            $display_options = $current_view->getOriginal('display.' . $display_page . '.display_options');
+            $overrides[$config_name]['display'][$display_page]['display_options'] = array_merge($display_options, [
+              'pager' => [
+                'type' => 'infinite_scroll',
+                'options' => [
+                  'views_infinite_scroll' => [
+                    'button_text' => $button_text,
+                    'automatically_load_content' => $automatically_load_content,
+                  ],
                 ],
               ],
-            ],
-            'use_ajax' => TRUE,
-          ]);
+              'use_ajax' => TRUE,
+            ]);
+          }
         }
 
       }
