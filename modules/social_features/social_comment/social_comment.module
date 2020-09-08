@@ -187,12 +187,15 @@ function social_comment_comment_links_alter(array &$links, CommentInterface $ent
     ];
   }
 
+  $items = explode(".", $entity->getThread());
+  $levels = \Drupal::config('social_comment.settings')->get('social_comment_level') ? \Drupal::config('social_comment.settings')->get('social_comment_level') : 1;
+
   if ($bundle === 'post_comment') {
     // For post comments remove the reply button.
     unset($links['comment']['#links']['comment-reply']);
   }
   // If it is not a post comment do some extra checks.
-  elseif ($entity->getParentComment() !== NULL || \Drupal::routeMatch()->getRouteName() === 'comment.reply') {
+  elseif (($entity->getParentComment() !== NULL && count($items) >= ++$levels) || \Drupal::routeMatch()->getRouteName() === 'comment.reply') {
     // If this is already on the second level, remove the reply button.
     unset($links['comment']['#links']['comment-reply']);
   }
@@ -275,10 +278,21 @@ function social_comment_comment_view(array &$build, EntityInterface $entity, Ent
     $commented_entity = $entity->getCommentedEntity();
     if (is_object($commented_entity)) {
       $commented_entity_type = $commented_entity->getEntityTypeId();
+
+      // Define which display mode should be used for commented_entity.
+      if (\Drupal::routeMatch()->getRouteName() === 'entity.node.canonical' &&
+        \Drupal::routeMatch()->getParameter('node')->bundle() === 'dashboard'
+      ) {
+        $node_view_display = 'featured';
+      }
+      else {
+        $node_view_display = 'activity_comment';
+      }
+
       // Teaser of commented entity.
       $build['commented_entity'] = \Drupal::entityTypeManager()
         ->getViewBuilder($commented_entity_type)
-        ->view($commented_entity, 'activity_comment');
+        ->view($commented_entity, $node_view_display);
 
       // Prepare the "Show all comments" link.
       if ($commented_entity_type === 'post') {
