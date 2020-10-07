@@ -37,7 +37,7 @@
 
   @include for-tablet-portrait-up {
     flex-wrap: nowrap;
-    height: 220px; // matches width of image
+    min-height: 220px; // matches width of image
   }
 
 }
@@ -49,12 +49,24 @@
 
   @include for-tablet-portrait-up {
     display: block;
-    height: 220px;
     flex: 0 0 220px;
     position: relative;
     overflow: hidden;
     width: auto;
     padding-top: 0;
+  }
+
+  // In browsers where the title line-clamp doesn't work the image may need to
+  // stretch for larger horizontal teasers. This assumes that the icon is the
+  // first link and the image is second.
+  a:last-child {
+    flex: 1 0 100%;
+
+    img {
+      height: 100%;
+      width: auto;
+      max-width: unset;
+    }
   }
 }
 
@@ -101,10 +113,15 @@
 
 // Title of the teaser
 .teaser__title {
+  display: block;
   margin-top: 0;
   margin-bottom: 20px;
-  max-height: 2.3em;
   overflow: hidden;
+
+  // Limit title to two lines in supporting browsers.
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 // Body of the teaser, contains the content and the actionbar. Shown on the right side next to the image
