@@ -9,6 +9,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Template\Attribute;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Drupal\group\Entity\GroupInterface;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements template_preprocess_form().
@@ -337,6 +339,10 @@ function socialbase_form_alter(&$form, FormStateInterface $form_state, $form_id)
     ]
   );
 
+  if (in_array($form_id, $group_default_forms, TRUE) && theme_get_setting('content_entity_form_style') === 'open_social') {
+    _socialbase_update_content_entity_forms($form, $form_state);
+  }
+
   if (in_array($form_id, $default_forms)) {
     $form['#attributes']['class'][] = 'form--default';
 
@@ -496,6 +502,12 @@ function socialbase_form_node_form_alter(&$form, FormStateInterface $form_state,
     $form['actions']['unpublish']['#button_level'] = 'raised';
     $form['actions']['unpublish']['#button_type'] = 'primary';
   }
+
+  // Update the node forms according to #3186003.
+  if (theme_get_setting('content_entity_form_style') === 'open_social') {
+    _socialbase_update_content_entity_forms($form, $form_state);
+  }
+
 }
 
 /**
@@ -514,4 +526,257 @@ function socialbase_form_search_content_form_alter(&$form) {
 function socialbase_form_node_layout_builder_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   // Make the layout builder specific styling available.
   $form['#attached']['library'][] = 'socialbase/form--toolbar';
+}
+
+/**
+ * Updates any content entity form with the new #3186003 content.
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ */
+function _socialbase_update_content_entity_forms(array &$form, FormStateInterface $form_state) {
+  // Let's remove the form elements not needed by Open Social.
+  // We understand this is quite BC breaking, url_redirects / revision info
+  // we don't use as Open Social, you might use. So by
+  // changing the theme setting in social blue, you can go back to the
+  // old settings and use Field UI to change the other fields.
+  if (theme_get_setting('content_entity_form_style') === 'open_social') {
+    // We want to move all the fields from $form['advanced'] to our new
+    // field sets which are created as part of #3186003.
+    if (!empty($form['advanced'])) {
+      unset($form['advanced']);
+    }
+
+    // Unset optional fields.
+    if (isset($form['revision'])) {
+      unset($form['revision']);
+    }
+
+    if (isset($form['revision_log'])) {
+      unset($form['revision_log']);
+    }
+
+    if (isset($form['revision_information'])) {
+      unset($form['revision_information']);
+    }
+
+    if (isset($form['url_redirects'])) {
+      unset($form['url_redirects']);
+    }
+
+    if (isset($form['meta'])) {
+      unset($form['meta']);
+    }
+
+    // Add descriptive text to URL Alias field.
+    if (isset($form['path']['widget'][0]['alias'])) {
+      $form['path']['widget'][0]['alias']['#description'] = t('The URL alias allows you to customise the link to this page.');
+    }
+
+    // Hide the automatic URL alias.
+    if (isset($form['path']['widget'][0]['pathauto'])) {
+      $form['path']['widget'][0]['pathauto']['#type'] = 'hidden';
+      // Path uses the above checkbox to decide whether or not to save
+      // the automatically generated alias, or use a custom one.
+      // since we hide the element, and the default is checked,
+      // the path will never be overridden if someone updates it.
+      // So we need to check this in our custom submit handler.
+      // It should perform before path auto runs.
+      array_unshift($form['actions']['submit']['#submit'], '_socialbase_path_widget_submit');
+    }
+
+    // Move the fields from advanced to group_settings.
+    if (!empty($form['#fieldgroups']['group_settings'])) {
+      // Move the book outline fields to the group settings.
+      // #502430 we need to remove this ourselves, users with permission
+      // can see the book outline even when not configured as part
+      // of the book settings.
+      if (!empty($form['book']) &&
+        $form_state->getFormObject() !== NULL &&
+        \Drupal::moduleHandler()->moduleExists('book')) {
+        // Grab the Entity to see if books are enabled for this one.
+        $entity = $form_state->getFormObject()->getEntity();
+        if (method_exists($entity, 'getType') && !empty($entity->getType()) && is_string($entity->getType())) {
+          // Move it to our new fieldset on book pages either on its own
+          // or in the group_settings.
+          $form['book']['#type'] = 'fieldset';
+          $form['book']['#attributes']['class'][] = 'card';
+          $form['book']['#weight'] = isset($form['#fieldgroups']['group_visibility']->weight) ? $form['#fieldgroups']['group_visibility']->weight + 1 : '3';
+          $enabled = book_type_is_allowed($entity->getType());
+          // If it's not enabled we can just safely unset it.
+          if (!$enabled) {
+            unset($form['book']);
+          }
+        }
+      }
+
+      // Move the node Menu settings to group_settings.
+      if (!empty($form['menu'])) {
+        $form['menu']['#group'] = 'group_settings';
+        $form['menu']['#weight'] = -20;
+        $form['menu']['#title'] = t('Menu link');
+        if (!empty($form['menu']['link']['title'])) {
+          $form['menu']['link']['title']['#title'] = t('Title');
+          $form['menu']['link']['title']['#description'] = t('This title will be displayed in the menu.');
+        }
+        if (!empty($form['menu']['link']['description'])) {
+          $form['menu']['link']['title']['#description'] = t('This description will be displayed when hovering over the menu link.');
+        }
+      }
+
+      // Move the Published status to group settings with a new wrapper.
+      if (!empty($form['status'])) {
+        // Add an details element to status.
+        $form['status_label'] = [
+          '#type' => 'details',
+          '#title' => t('Publish status'),
+          '#description' => '',
+          '#open' => TRUE,
+          '#weight' => 110,
+          '#group' => 'group_settings',
+        ];
+        $form['status']['#group'] = 'status_label';
+      }
+
+      // Node author information for administrators.
+      if (isset($form['uid']) || isset($form['created'])) {
+        $form['author_info'] = [
+          '#type' => 'details',
+          '#title' => t('Author Information'),
+          '#description' => '',
+          '#open' => TRUE,
+          '#weight' => 100,
+          '#group' => 'group_settings',
+        ];
+      }
+
+      // Move author uid to the new author info fieldset,
+      // and remove descriptive text.
+      if (isset($form['uid'])) {
+        $form['uid']['#group'] = 'author_info';
+        $form['uid']['widget']['#description'] = '';
+        if (!empty($form['uid']['widget'][0]['target_id'])) {
+          $form['uid']['widget'][0]['target_id']['#description'] = '';
+        }
+        $form['author_info']['uid'] = $form['uid'];
+        unset($form['uid']);
+      }
+
+      // Move created to the new author info fieldset,
+      // and remove descriptive text.
+      if (isset($form['created'])) {
+        $form['created']['#group'] = 'author_info';
+        $form['created']['widget']['#description'] = '';
+        $form['created']['widget'][0]['#description'] = '';
+        $form['created']['widget'][0]['value']['#description'] = '';
+        $form['author_info']['created'] = $form['created'];
+        unset($form['created']);
+      }
+    }
+
+    // According to FileWidget.php we cant use a widget form alter.
+    if (!empty($form['field_files']) && !empty($form['field_files']['widget']['#file_upload_title'])) {
+      $form['field_files']['widget']['#file_upload_title'] = t('Attachments');
+    }
+
+    // Change the button text from Save to Create topic / event etc.
+    // Adds a cancel button.
+    // Removes the preview button.
+    if (!empty($form['actions']['submit']) &&
+      !empty($form['actions']['submit']['#value']) &&
+      $form_state->getFormObject() !== NULL &&
+      method_exists($form_state->getFormObject(), 'getOperation')) {
+
+      // Change the button text from Save to Create topic / event etc.
+      // Only on node add pages.
+      if ($form_state->getFormObject()->getOperation() !== 'edit') {
+        $entity = $form_state->getFormObject()->getEntity();
+        if (method_exists($entity, 'getType') && !empty($entity->getType()) && is_string($entity->getType())) {
+          $form['actions']['submit']['#value'] = t('Create @entity', ['@entity' => $entity->getType()]);
+        }
+        if (method_exists($entity, 'getGroupType') && !empty($entity->getGroupType()) && is_string($entity->getGroupType()->label())) {
+          $form['actions']['submit']['#value'] = t('Create @entity', ['@entity' => $entity->getGroupType()->label()]);
+        }
+      }
+
+      // Adds cancel button.
+      if (!isset($form['actions']['cancel'])) {
+        $form['actions']['cancel'] = [
+          '#type' => 'submit',
+          '#value' => t('Cancel'),
+          '#submit' => ['_socialbase_entity_cancel'],
+          '#limit_validation_errors' => [],
+          '#attributes' => [
+            'class' => ['button btn-default btn waves-effect waves-btn'],
+          ],
+        ];
+      }
+
+      // Remove the preview button.
+      if (isset($form['actions']['preview'])) {
+        unset($form['actions']['preview']);
+      }
+    }
+  }
+}
+
+/**
+ * Custom form submit handler for handling an path alias update.
+ *
+ * @param array $form
+ *   The form array.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   Form state.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _socialbase_path_widget_submit(array $form, FormStateInterface $form_state) {
+  // Path uses the pathauto checkbox to decide whether or not to save
+  // the automatically generated alias, or use a custom one.
+  // since we hide the element, and the default is checked,
+  // the path will never be overridden if someone updates it.
+  // So we need to check this in our custom submit handler.
+  $default_path = $form['path']['widget'][0]['alias']['#default_value'];
+  $input = $form_state->getUserInput();
+  $updated_path = isset($input['path'][0]['alias']) ? $input['path'][0]['alias'] : '';
+  // If we don't have a match, make sure we override the checkbox as well.
+  if ($updated_path !== $default_path) {
+    // Override the User input, act as if this was changed.
+    $input['path'][0]['pathauto'] = "0";
+    $form_state->setUserInput($input);
+    // Override the value.
+    $form_state->setValue(['path', '0', 'pathauto'], "0");
+  }
+}
+
+/**
+ * Redirects to the canonical page, or home when pressing cancel form.
+ *
+ * @param array $form
+ *   Join and leave form.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   Form state interface.
+ */
+function _socialbase_entity_cancel(array &$form, FormStateInterface $form_state) {
+  // By default the front page will be used,
+  // especially for adding a node.
+  $form_state->setRedirect('<front>');
+
+  // If we have an existing node, we rather go to the node itself.
+  if (!empty($form_state->getFormObject()->getEntity())) {
+    $entity = $form_state->getFormObject()->getEntity();
+
+    if ($entity instanceof NodeInterface && $entity->id() !== NULL) {
+      $form_state->setRedirect(
+        'entity.node.canonical',
+        ['node' => $entity->id(), []]
+      );
+    }
+    if ($entity instanceof GroupInterface && $entity->id() !== NULL) {
+      $form_state->setRedirect(
+        'entity.group.canonical',
+        ['group' => $entity->id(), []]
+      );
+    }
+  }
 }
