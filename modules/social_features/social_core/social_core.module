@@ -858,7 +858,7 @@ function social_core_form_node_form_alter(&$form, FormStateInterface $form_state
         /** @var \Drupal\Node\NodeInterface $entity */
         $entity = $form_state->getFormObject()->getEntity();
         if (!empty(node_get_type_label($entity)) && is_string(node_get_type_label($entity))) {
-          $form['actions']['submit']['#value'] = t('Create @entity', ['@entity' => node_get_type_label($entity)]);
+          $form['actions']['submit']['#value'] = t('Create @entity', ['@entity' => strtolower(node_get_type_label($entity))]);
         }
       }
 
