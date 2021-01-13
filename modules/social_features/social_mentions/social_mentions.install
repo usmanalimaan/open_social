@@ -86,3 +86,17 @@ function _social_mentions_set_default_config() {
 
   $config->save();
 }
+
+/**
+ * Enable mentions on the full_html filter format.
+ */
+function social_mentions_update_8002() {
+  /** @var \Drupal\update_helper\Updater $updateHelper */
+  $updateHelper = \Drupal::service('update_helper.updater');
+
+  // Execute configuration update definitions with logging of success.
+  $updateHelper->executeUpdate('social_mentions', 'social_mentions_update_8002');
+
+  // Output logged messages to related channel of update execution.
+  return $updateHelper->logger()->output();
+}

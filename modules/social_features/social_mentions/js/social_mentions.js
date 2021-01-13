@@ -118,7 +118,7 @@
   // Initiate mentions.
   Drupal.behaviors.socialMentions = {
     attach: function(context, settings) {
-      var formIds = ".comment-form, #social-post-entity-form";
+      var formIds = ".comment-form, #social-post-entity-form, .node-discussion-form, .node-discussion-edit-form";
       var CKEDITOR = getCkeditor();
       CKEDITOR.on("instanceReady", function () {
         $(formIds).once("socialMentions").each(function (i, element) {

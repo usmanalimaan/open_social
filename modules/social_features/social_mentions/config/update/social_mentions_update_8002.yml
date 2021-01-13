@@ -1,0 +1,20 @@
+filter.format.full_html:
+  expected_config: {  }
+  update_actions:
+    add:
+      filters:
+        filter_mentions:
+          id: filter_mentions
+          provider: mentions
+          settings:
+            mentions_filter:
+              ProfileMention: ProfileMention
+              UserMention: UserMention
+          status: true
+          weight: -10
+mentions.settings:
+  expected_config: {  }
+  update_actions:
+    add:
+      supported_entity_types:
+        node: node

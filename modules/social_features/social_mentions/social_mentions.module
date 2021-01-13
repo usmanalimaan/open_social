@@ -21,6 +21,8 @@ function social_mentions_form_alter(&$form, FormStateInterface $form_state, $for
     'social_post_entity_form',
     'comment_post_comment_form',
     'comment_comment_form',
+    'node_discussion_form',
+    'node_discussion_edit_form',
   ];
 
   if (in_array($form_id, $mentions_forms)) {
