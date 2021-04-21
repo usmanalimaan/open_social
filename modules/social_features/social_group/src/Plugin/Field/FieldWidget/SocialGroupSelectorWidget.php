@@ -155,6 +155,12 @@ class SocialGroupSelectorWidget extends OptionsSelectWidget implements Container
 
     array_walk_recursive($options, [$this, 'sanitizeLabel']);
 
+    // Set required property for the current object.
+    /** @see \Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsWidgetBase::getOptions() */
+    if (!isset($this->options)) {
+      $this->options = $options ?? parent::getOptions($entity);
+    }
+
     return $options;
   }
 
@@ -180,6 +186,17 @@ class SocialGroupSelectorWidget extends OptionsSelectWidget implements Container
       '#type' => 'value',
       '#value' => $default_visibility,
     ];
+
+    // Check if cross-posting feature is enabled and disable
+    // multi-selection if entity type is not in the list.
+    $social_group_settings = $this->configFactory->get('social_group.settings');
+    if ($social_group_settings->get('cross_posting.status')) {
+      $bundle = $items->getEntity()->bundle();
+      $allowed_types = $social_group_settings->get('cross_posting.entity_types');
+      if (!in_array($bundle, $allowed_types, TRUE)) {
+        $element['#multiple'] = FALSE;
+      }
+    }
 
     $change_group_node = $this->configFactory->get('social_group.settings')
       ->get('allow_group_selection_in_node');

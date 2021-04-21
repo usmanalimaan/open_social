@@ -3,11 +3,18 @@
 namespace Drupal\social_group\Form;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Render\Element\Checkboxes;
 use Drupal\Core\Url;
 use Drupal\crop\Entity\CropType;
+use Drupal\group\Plugin\GroupContentEnablerManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Settings form which enables site managers to configure different options.
@@ -15,6 +22,63 @@ use Drupal\crop\Entity\CropType;
  * @package Drupal\social_event_managers\Form
  */
 class SocialGroupSettings extends ConfigFormBase {
+
+  /**
+   * The group content plugin manager.
+   *
+   * @var \Drupal\group\Plugin\GroupContentEnablerManagerInterface
+   */
+  protected $groupContentPluginManager;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * Constructs a \Drupal\system\ConfigFormBase object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler service.
+   * @param \Drupal\group\Plugin\GroupContentEnablerManagerInterface $group_content_plugin_manager
+   *   The group content plugin manager.
+   */
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    EntityTypeManagerInterface $entity_type_manager,
+    ModuleHandlerInterface $module_handler,
+    GroupContentEnablerManagerInterface $group_content_plugin_manager
+  ) {
+    parent::__construct($config_factory);
+    $this->entityTypeManager = $entity_type_manager;
+    $this->moduleHandler = $module_handler;
+    $this->groupContentPluginManager = $group_content_plugin_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('entity_type.manager'),
+      $container->get('module_handler'),
+      $container->get('plugin.manager.group_content_enabler')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -64,6 +128,34 @@ class SocialGroupSettings extends ConfigFormBase {
       '#weight' => 20,
     ];
 
+    // Cross-posting settings.
+    $form['cross_posting'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Cross-posting settings'),
+      '#open' => FALSE,
+      '#weight' => 30,
+      '#tree' => TRUE,
+    ];
+
+    $form['cross_posting']['status'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable cross-posting'),
+      '#description' => $this->t('If enabled, one node can be added as a group content to multiple groups.'),
+      '#default_value' => $config->get('cross_posting.status'),
+    ];
+
+    $form['cross_posting']['node_types'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Entity types'),
+      '#options' => $this->getCrossPostingEntityTypesOptions(),
+      '#default_value' => $config->get('cross_posting.entity_types') ?? [],
+      '#states' => [
+        'visible' => [
+          ':input[name="cross_posting[status]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
     // Add an option for site manager to enable/disable option to choose group
     // type on page to add flexible groups.
     if (\Drupal::moduleHandler()->moduleExists('social_group_flexible_group')) {
@@ -95,8 +187,12 @@ class SocialGroupSettings extends ConfigFormBase {
       $config->set($key, !empty($value));
     }
 
-    $config->set('default_hero', $form_state->getValue('default_hero'))->save();
-    $config->set('social_group_type_required', $form_state->getValue('social_group_type_required'))->save();
+    $config->set('cross_posting.status', $form_state->getValue(['cross_posting', 'status']));
+    $config->set('cross_posting.entity_types', Checkboxes::getCheckedCheckboxes($form_state->getValue(['cross_posting', 'entity_types'])));
+
+    $config->set('default_hero', $form_state->getValue('default_hero'));
+    $config->set('social_group_type_required', $form_state->getValue('social_group_type_required'));
+    $config->save();
 
     Cache::invalidateTags(['group_view']);
   }
@@ -136,6 +232,31 @@ class SocialGroupSettings extends ConfigFormBase {
    */
   protected function hasPermission($name) {
     return !empty($this->config('social_group.settings')->get($name));
+  }
+
+  /**
+   * Returns node types list used as a group content.
+   *
+   * @return array
+   *   An array with options.
+   */
+  private function getCrossPostingEntityTypesOptions() {
+    // The list of node types allowed for cross-posting in groups.
+    // @todo: maybe is better to create a list of entity bundles keyed by entity type.
+    $entity_types = ['topic', 'event'];
+    // Add possibility to add entity types from other modules.
+    $this->moduleHandler->alter('cross_posting_entity_list', $entity_types);
+
+    $group_content_types = $this->groupContentPluginManager->getInstalledIds();
+    foreach ($entity_types as $bundle) {
+      $plugin_id = 'group_node:' . $bundle;
+      if (in_array($plugin_id, $group_content_types)) {
+        $node_type = $this->entityTypeManager->getStorage('node_type')->load($bundle);
+        $options[$bundle] = $node_type->label();
+      }
+    }
+
+    return $options ?? [];
   }
 
 }

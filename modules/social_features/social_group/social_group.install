@@ -599,3 +599,13 @@ function social_group_update_8904() {
   $config = \Drupal::configFactory()->getEditable('social_group.settings');
   $config->set('social_group_type_required', FALSE)->save();
 }
+
+/**
+ * Set the default group configuration for cross-posting settings.
+ */
+function social_group_update_8905() {
+  $config = \Drupal::configFactory()->getEditable('social_group.settings');
+  $config->set('cross_posting.status', FALSE);
+  $config->set('cross_posting.entity_types', []);
+  $config->save();
+}
