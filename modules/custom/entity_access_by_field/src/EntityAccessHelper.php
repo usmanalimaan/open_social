@@ -79,17 +79,19 @@ class EntityAccessHelper {
                     return EntityAccessHelper::NEUTRAL;
                   }
                   elseif (!$account->hasPermission('view ' . $permission_label . ' content')) {
-                    // Lets verify if we are a member for flexible groups.
-                    $groups = GroupContent::loadByEntity($node);
-                    if (!empty($groups)) {
-                      $group = reset($groups)->getGroup();
-                      if ($group instanceof Group
-                        && !$group->getMember($account)
-                        && $group->getGroupType()->id() === 'flexible_group') {
-                        return EntityAccessHelper::FORBIDDEN;
+                    // If user doesn't have permission we just check user
+                    // membership in groups where the node attached as
+                    // group content.
+                    $group_contents = GroupContent::loadByEntity($node);
+                    // Check recursively - if user is a member at least in one
+                    // group we should allow to check access by gnode module.
+                    /** @see gnode_node_access() */
+                    foreach($group_contents as $group_content) {
+                      $group = $group_content->getGroup();
+                      if ($group instanceof Group && $group->getMember($account)) {
+                        return EntityAccessHelper::NEUTRAL;
                       }
                     }
-                    return EntityAccessHelper::NEUTRAL;
                   }
                 }
                 if ($account->hasPermission('view ' . $permission_label . ' content')) {
