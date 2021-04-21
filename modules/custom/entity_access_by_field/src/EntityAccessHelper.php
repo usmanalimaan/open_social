@@ -15,6 +15,21 @@ use Drupal\social_event\EventEnrollmentInterface;
 class EntityAccessHelper {
 
   /**
+   * Neutral status.
+   */
+  const NEUTRAL = 0;
+
+  /**
+   * Forbidden status.
+   */
+  const FORBIDDEN = 1;
+
+  /**
+   * Allowed status.
+   */
+  const ALLOW = 2;
+
+  /**
    * Array with values which need to be ignored.
    *
    * @todo Add group to ignored values (when outsider role is working).
@@ -35,7 +50,7 @@ class EntityAccessHelper {
       if (isset($node->status) && $node->status->value === NodeInterface::NOT_PUBLISHED) {
         $unpublished_own = $account->hasPermission('view own unpublished content');
         if (($node->getOwnerId() !== $account->id()) || ($node->getOwnerId() === $account->id() && !$unpublished_own)) {
-          return 1;
+          return EntityAccessHelper::FORBIDDEN;
         }
       }
 
@@ -51,7 +66,7 @@ class EntityAccessHelper {
               if (isset($field_value['value'])) {
 
                 if (in_array($field_value['value'], EntityAccessHelper::getIgnoredValues())) {
-                  return 0;
+                  return EntityAccessHelper::NEUTRAL;
                 }
 
                 $permission_label = $field_definition->id() . ':' . $field_value['value'];
@@ -61,9 +76,9 @@ class EntityAccessHelper {
                 if ($field_value['value'] === 'group') {
                   // Don't look no further.
                   if ($account->hasPermission('manage all groups')) {
-                    return 0;
+                    return EntityAccessHelper::NEUTRAL;
                   }
-                  if (!$account->hasPermission('view ' . $permission_label . ' content')) {
+                  elseif (!$account->hasPermission('view ' . $permission_label . ' content')) {
                     // Lets verify if we are a member for flexible groups.
                     $groups = GroupContent::loadByEntity($node);
                     if (!empty($groups)) {
@@ -71,17 +86,17 @@ class EntityAccessHelper {
                       if ($group instanceof Group
                         && !$group->getMember($account)
                         && $group->getGroupType()->id() === 'flexible_group') {
-                        return 1;
+                        return EntityAccessHelper::FORBIDDEN;
                       }
                     }
-                    return 0;
+                    return EntityAccessHelper::NEUTRAL;
                   }
                 }
                 if ($account->hasPermission('view ' . $permission_label . ' content')) {
-                  return 2;
+                  return EntityAccessHelper::ALLOW;
                 }
                 if (($account->id() !== 0) && ($account->id() === $node->getOwnerId())) {
-                  return 2;
+                  return EntityAccessHelper::ALLOW;
                 }
 
               }
@@ -91,10 +106,10 @@ class EntityAccessHelper {
         }
       }
       if (isset($access) && $access === FALSE) {
-        return 1;
+        return EntityAccessHelper::FORBIDDEN;
       }
     }
-    return 0;
+    return EntityAccessHelper::NEUTRAL;
   }
 
   /**
@@ -122,18 +137,17 @@ class EntityAccessHelper {
           if ($enrollment->field_request_or_invite_status
             && (int) $enrollment->field_request_or_invite_status->value !== EventEnrollmentInterface::REQUEST_OR_INVITE_DECLINED
             && (int) $enrollment->field_request_or_invite_status->value !== EventEnrollmentInterface::INVITE_INVALID_OR_EXPIRED) {
-            $access = 2;
+            $access = EntityAccessHelper::ALLOW;
           }
         }
       }
-
     }
 
     switch ($access) {
-      case 2:
+      case EntityAccessHelper::ALLOW:
         return AccessResult::allowed()->cachePerPermissions()->addCacheableDependency($node);
 
-      case 1:
+      case EntityAccessHelper::FORBIDDEN:
         return AccessResult::forbidden();
     }
 
