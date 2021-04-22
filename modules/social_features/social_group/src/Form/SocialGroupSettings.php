@@ -144,7 +144,7 @@ class SocialGroupSettings extends ConfigFormBase {
       '#default_value' => $config->get('cross_posting.status'),
     ];
 
-    $form['cross_posting']['node_types'] = [
+    $form['cross_posting']['entity_types'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Entity types'),
       '#options' => $this->getCrossPostingEntityTypesOptions(),
