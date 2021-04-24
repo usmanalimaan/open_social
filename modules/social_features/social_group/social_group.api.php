@@ -194,5 +194,17 @@ function hook_social_group_settings_alter(&$social_group_types) {
 }
 
 /**
+ * Extends entities (node types) list which can be added to multiple groups.
+ *
+ * @param array $entity_types
+ *   The entity types ids list.
+ *
+ * @ingroup social_group_api
+ */
+function hook_social_group_cross_posting_alter(array &$entity_types) {
+  $entity_types[] = 'topic';
+}
+
+/**
  * @} End of "addtogroup hooks".
  */

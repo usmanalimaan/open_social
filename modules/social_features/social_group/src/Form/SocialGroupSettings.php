@@ -249,7 +249,7 @@ class SocialGroupSettings extends ConfigFormBase {
     // @todo: maybe is better to create a list of entity bundles keyed by entity type.
     $entity_types = ['topic', 'event'];
     // Add possibility to add entity types from other modules.
-    $this->moduleHandler->alter('cross_posting_entity_list', $entity_types);
+    $this->moduleHandler->alter('social_group_cross_posting', $entity_types);
 
     $group_content_types = $this->groupContentPluginManager->getInstalledIds();
     foreach ($entity_types as $bundle) {
