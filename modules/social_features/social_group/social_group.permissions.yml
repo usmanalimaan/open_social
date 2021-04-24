@@ -22,4 +22,6 @@ view groups on other profiles:
 'edit group types':
   title: 'Edit existing groups their group type'
   description: 'This permission grants access to change group types on already existing groups.'
-
+'access cross-posting group content':
+  title: 'Access cross-posting group content'
+  description: 'This permission grants access to add node to multiple groups.'

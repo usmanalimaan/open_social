@@ -187,19 +187,17 @@ class SocialGroupSelectorWidget extends OptionsSelectWidget implements Container
       '#value' => $default_visibility,
     ];
 
-    // Check if cross-posting feature is enabled and disable
-    // multi-selection if entity type is not in the list.
-    $social_group_settings = $this->configFactory->get('social_group.settings');
-    if ($social_group_settings->get('cross_posting.status')) {
-      $bundle = $items->getEntity()->bundle();
-      $allowed_types = $social_group_settings->get('cross_posting.entity_types');
-      if (!in_array($bundle, $allowed_types, TRUE)) {
-        $element['#multiple'] = FALSE;
-      }
+    // Disable multi-selection if cross-posting is disabled or current entity
+    // type isn't in the allowed list.
+    $sg_settings = $this->configFactory->get('social_group.settings');
+    $disable_multi_selection = !$sg_settings->get('cross_posting.status')
+      || !in_array($items->getEntity()->bundle(), $sg_settings->get('cross_posting.entity_types'), TRUE);
+
+    if ($disable_multi_selection) {
+      $element['#multiple'] = FALSE;
     }
 
-    $change_group_node = $this->configFactory->get('social_group.settings')
-      ->get('allow_group_selection_in_node');
+    $change_group_node = $sg_settings->get('allow_group_selection_in_node');
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = $form_state->getFormObject()->getEntity();
 
@@ -211,7 +209,9 @@ class SocialGroupSelectorWidget extends OptionsSelectWidget implements Container
       }
     }
     else {
-      if (!$change_group_node && !$this->currentUser->hasPermission('manage all groups')) {
+      $has_required_permissions = ($sg_settings->get('cross_posting.status') && $this->currentUser->hasPermission('access cross-posting group content'))
+        || $this->currentUser->hasPermission('manage all groups');
+      if (!$change_group_node && !$has_required_permissions) {
         $element['#disabled'] = TRUE;
         $element['#description'] = t('Moving content after creation function has been disabled. In order to move this content, please contact a site manager.');
       }

@@ -187,8 +187,12 @@ class SocialGroupSettings extends ConfigFormBase {
       $config->set($key, !empty($value));
     }
 
-    $config->set('cross_posting.status', $form_state->getValue(['cross_posting', 'status']));
-    $config->set('cross_posting.entity_types', Checkboxes::getCheckedCheckboxes($form_state->getValue(['cross_posting', 'entity_types'])));
+    $cross_posting_status = $form_state->getValue(['cross_posting', 'status']);
+    $config->set('cross_posting.status', $cross_posting_status);
+    $config->set('cross_posting.entity_types', $cross_posting_status
+      ? Checkboxes::getCheckedCheckboxes($form_state->getValue(['cross_posting', 'entity_types']))
+      : []
+    );
 
     $config->set('default_hero', $form_state->getValue('default_hero'));
     $config->set('social_group_type_required', $form_state->getValue('social_group_type_required'));
