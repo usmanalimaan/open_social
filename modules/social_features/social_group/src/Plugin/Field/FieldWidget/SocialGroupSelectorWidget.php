@@ -41,7 +41,7 @@ class SocialGroupSelectorWidget extends OptionsSelectWidget implements Container
   /**
    * The list of options.
    *
-   * @var string
+   * @var array
    *
    * @todo
    *   Should be removed after merging patch in the core:
