@@ -85,8 +85,8 @@ class EntityAccessHelper {
                     $group_contents = GroupContent::loadByEntity($node);
                     // Check recursively - if user is a member at least in one
                     // group we should allow to check access by gnode module.
-                    /** @see gnode_node_access() */
-                    foreach($group_contents as $group_content) {
+                    /* @see gnode_node_access() */
+                    foreach ($group_contents as $group_content) {
                       $group = $group_content->getGroup();
                       if ($group instanceof Group && $group->getMember($account)) {
                         return EntityAccessHelper::NEUTRAL;

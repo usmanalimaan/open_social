@@ -38,6 +38,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SocialGroupSelectorWidget extends OptionsSelectWidget implements ContainerFactoryPluginInterface {
 
+  /**
+   * The list of options.
+   *
+   * @var string
+   *
+   * @todo
+   *   Should be removed after merging patch in the core:
+   *   https://www.drupal.org/files/issues/2923353-5.patch
+   */
+  protected $options;
+
   protected $configFactory;
   protected $moduleHander;
   protected $currentUser;
@@ -156,7 +167,8 @@ class SocialGroupSelectorWidget extends OptionsSelectWidget implements Container
     array_walk_recursive($options, [$this, 'sanitizeLabel']);
 
     // Set required property for the current object.
-    /** @see \Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsWidgetBase::getOptions() */
+    // todo@: Should be removed after https://www.drupal.org/files/issues/2923353-5.patch will be merged in the core.
+    /* @see \Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsWidgetBase::getOptions() */
     if (!isset($this->options)) {
       $this->options = $options ?? parent::getOptions($entity);
     }
