@@ -620,7 +620,7 @@ function social_group_update_8905() {
 function social_group_update_8906() {
   $config = \Drupal::configFactory()->getEditable('social_group.settings');
   $config->set('cross_posting.status', FALSE);
-  $config->set('cross_posting.entity_types', []);
+  $config->set('cross_posting.content_types', []);
   $config->save();
 
   // Grand roles to use cross-posting feature.

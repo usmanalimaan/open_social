@@ -144,11 +144,11 @@ class SocialGroupSettings extends ConfigFormBase {
       '#default_value' => $config->get('cross_posting.status'),
     ];
 
-    $form['cross_posting']['entity_types'] = [
+    $form['cross_posting']['content_types'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Entity types'),
+      '#title' => $this->t('Content types'),
       '#options' => $this->getCrossPostingEntityTypesOptions(),
-      '#default_value' => $config->get('cross_posting.entity_types') ?? [],
+      '#default_value' => $config->get('cross_posting.content_types') ?? [],
       '#states' => [
         'visible' => [
           ':input[name="cross_posting[status]"]' => ['checked' => TRUE],
@@ -189,8 +189,8 @@ class SocialGroupSettings extends ConfigFormBase {
 
     $cross_posting_status = $form_state->getValue(['cross_posting', 'status']);
     $config->set('cross_posting.status', $cross_posting_status);
-    $config->set('cross_posting.entity_types', $cross_posting_status
-      ? Checkboxes::getCheckedCheckboxes($form_state->getValue(['cross_posting', 'entity_types']))
+    $config->set('cross_posting.content_types', $cross_posting_status
+      ? Checkboxes::getCheckedCheckboxes($form_state->getValue(['cross_posting', 'content_types']))
       : []
     );
 
@@ -247,12 +247,12 @@ class SocialGroupSettings extends ConfigFormBase {
   private function getCrossPostingEntityTypesOptions() {
     // The list of node types allowed for cross-posting in groups.
     // @todo: maybe is better to create a list of entity bundles keyed by entity type.
-    $entity_types = ['topic', 'event'];
+    $content_types = ['topic', 'event'];
     // Add possibility to add entity types from other modules.
-    $this->moduleHandler->alter('social_group_cross_posting', $entity_types);
+    $this->moduleHandler->alter('social_group_cross_posting', $content_types);
 
     $group_content_types = $this->groupContentPluginManager->getInstalledIds();
-    foreach ($entity_types as $bundle) {
+    foreach ($content_types as $bundle) {
       $plugin_id = 'group_node:' . $bundle;
       if (in_array($plugin_id, $group_content_types)) {
         $node_type = $this->entityTypeManager->getStorage('node_type')->load($bundle);

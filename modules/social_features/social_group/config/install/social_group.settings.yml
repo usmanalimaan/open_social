@@ -4,4 +4,4 @@ address_visibility_settings: false
 default_hero: null
 cross_posting:
   status: false
-  entity_types: {  }
+  content_types: {  }

@@ -203,7 +203,7 @@ class SocialGroupSelectorWidget extends OptionsSelectWidget implements Container
     // type isn't in the allowed list.
     $sg_settings = $this->configFactory->get('social_group.settings');
     $disable_multi_selection = !$sg_settings->get('cross_posting.status')
-      || !in_array($items->getEntity()->bundle(), $sg_settings->get('cross_posting.entity_types'), TRUE);
+      || !in_array($items->getEntity()->bundle(), $sg_settings->get('cross_posting.content_types'), TRUE);
 
     if ($disable_multi_selection) {
       $element['#multiple'] = FALSE;
