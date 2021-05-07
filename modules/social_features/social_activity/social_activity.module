@@ -307,3 +307,20 @@ function social_activity_preprocess_block(&$variables) {
     }
   }
 }
+
+/**
+ * Implements hook_views_data().
+ */
+function social_activity_views_data() {
+  $data['activity']['activity_aggregate_gc'] = [
+    'title' => t('Aggregate notifications by Group Content'),
+    'filter' => [
+      'title' => t('Aggregate notifications by Group Content'),
+      'help' => t('Aggregate notifications by Group Content'),
+      'field' => 'field_activity_entity',
+      'id' => 'activity_aggregate_gc',
+    ],
+  ];
+
+  return $data;
+}
