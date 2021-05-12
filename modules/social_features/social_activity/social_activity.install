@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\Core\Config\FileStorage;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\message\Entity\MessageTemplate;
 
@@ -273,4 +274,14 @@ function social_activity_update_8901() {
 
   // Output logged messages to related channel of update execution.
   return $updateHelper->logger()->output();
+}
+
+/**
+ * Add a new message template for group content.
+ */
+function social_activity_update_8902() {
+  $config_path = drupal_get_path('module', 'social_activity') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write('message.template.create_content_in_joined_groups', $source->read('message.template.create_content_in_joined_groups'));
 }
