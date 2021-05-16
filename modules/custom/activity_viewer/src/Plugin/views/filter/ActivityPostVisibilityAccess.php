@@ -220,6 +220,15 @@ class ActivityPostVisibilityAccess extends FilterPluginBase {
       $or->condition($comments_on_content);
     }
 
+    // For "group content" entities we need to add the condition
+    // to check what groups user has access.
+    if ($account->isAuthenticated()) {
+      $membership_access = new Condition('AND');
+      $membership_access->condition('activity__field_activity_entity.field_activity_entity_target_type', 'group_content');
+      $membership_access->condition('activity__field_activity_recipient_group.field_activity_recipient_group_target_id', $groups_unique, 'IN');
+      $or->condition($membership_access);
+    }
+
     // Lets add all the or conditions to the Views query.
     $and_wrapper->condition($or);
     $this->query->addWhere('visibility', $and_wrapper);

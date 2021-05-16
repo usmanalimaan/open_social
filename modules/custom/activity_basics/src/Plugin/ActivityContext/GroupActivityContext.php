@@ -105,15 +105,12 @@ class GroupActivityContext extends ActivityContextBase {
     // Special cases for comments.
     if ($entity->getEntityTypeId() === 'comment') {
       // Returns the entity to which the comment is attached.
-      $entity = $entity->getCommentedEntity();
+      if ($entity->getCommentedEntity()) {
+        return FALSE;
+      }
     }
 
-    if (!isset($entity)) {
-      return FALSE;
-    }
-
-    // Check if it's placed in a group (regardless off content type).
-    if (GroupContent::loadByEntity($entity)) {
+    if ($entity->getEntityTypeId() === 'group_content') {
       return TRUE;
     }
 
@@ -121,6 +118,11 @@ class GroupActivityContext extends ActivityContextBase {
       if (!$entity->field_recipient_group->isEmpty()) {
         return TRUE;
       }
+    }
+
+    // Check if it's placed in a group (regardless off content type).
+    if (GroupContent::loadByEntity($entity)) {
+      return TRUE;
     }
 
     return FALSE;
