@@ -14,14 +14,19 @@ use Drupal\node\NodeInterface;
  * Implements hook_token_info().
  */
 function social_activity_token_info() {
-  $additional_information['additional_information'] = [
+  $message['additional_information'] = [
     'name' => t('Additional information.'),
     'description' => t('Additional message information.'),
   ];
 
+  $message['count_groups_per_node'] = [
+    'name' => t('Groups count per node.'),
+    'description' => t('Number of groups where node is added.'),
+  ];
+
   return [
     'tokens' => [
-      'message' => $additional_information,
+      'message' => $message,
     ],
   ];
 }
@@ -106,7 +111,26 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
               }
             }
           }
+          break;
 
+        case 'count_groups_per_node':
+          if (!$message->get('field_message_related_object')->isEmpty()) {
+            $target_type = $message->get('field_message_related_object')->target_type;
+            $target_id = $message->get('field_message_related_object')->target_id;
+
+            if ($entity = \Drupal::entityTypeManager()
+              ->getStorage($target_type)
+              ->load($target_id)) {
+              // For the moment we can count only for group_content and node entities.
+              $count = \Drupal::service('social_group.cross_posting')
+                ->countGroupsByGroupContentNode($entity);
+
+              // Build the string like "(+ 4 groups more)".
+              $replacements[$original] = $count
+                ? '(+ ' . $count . ' ' . ($count > 1 ? t('groups') : t('group'))->render() . '  more)'
+                : '';
+            }
+          }
           break;
 
       }
