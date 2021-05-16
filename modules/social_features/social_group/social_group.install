@@ -13,6 +13,7 @@ use Drupal\user\Entity\Role;
 use Drupal\social_post\Entity\Post;
 use Drupal\node\Entity\Node;
 use Symfony\Component\Yaml\Yaml;
+use Drupal\Core\Config\FileStorage;
 
 /**
  * Implements hook_update_dependencies().
@@ -53,6 +54,7 @@ function social_group_install() {
 
   // Set the view mode to use when shown in activities.
   activity_creator_set_entity_view_mode('group', 'stream');
+  activity_creator_set_entity_view_mode('group_content', 'activity');
 
   // Make sure the admin theme is not used when managing groups.
   $group_settings = \Drupal::configFactory()->getEditable('group.settings');
@@ -627,4 +629,26 @@ function social_group_update_8906() {
   foreach (['authenticated', 'sitemanager', 'contentmanager', 'administrator'] as $role_id) {
     user_role_grant_permissions($role_id, ['access cross-posting group content']);
   }
+
+  // Install new configs.
+  $config_path = drupal_get_path('module', 'social_group') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+
+  $config_names = [
+    'core.entity_view_mode.group_content.activity',
+    'core.entity_view_display.group_content.closed_group-group_node-event.activity',
+    'core.entity_view_display.group_content.closed_group-group_node-topic.activity',
+    'core.entity_view_display.group_content.open_group-group_node-event.activity',
+    'core.entity_view_display.group_content.open_group-group_node-topic.activity',
+    'core.entity_view_display.group_content.public_group-group_node-event.activity',
+    'core.entity_view_display.group_content.public_group-group_node-topic.activity',
+  ];
+
+  foreach ($config_names as $name) {
+    $config_storage->write($name, $source->read($name));
+  }
+
+  // Set display mode for group content to display on stream.
+  activity_creator_set_entity_view_mode('group_content', 'activity');
 }
