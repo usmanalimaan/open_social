@@ -300,13 +300,11 @@ function social_activity_update_8902() {
   $config_names = [
     'message.template.create_event_group',
     'message.template.create_topic_group',
+    'message.template.moved_content_between_groups',
   ];
   foreach ($config_names as $name) {
     $config = $config_factory->getEditable($name);
     $config->clear('third_party_settings.activity_logger.activity_destinations.stream_group');
     $config->save();
   }
-
-  // Delete redundant message template.
-  $config_factory->getEditable('message.template.moved_content_between_groups')->delete();
 }
