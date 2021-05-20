@@ -156,6 +156,20 @@ class SocialGroupSettings extends ConfigFormBase {
       ],
     ];
 
+    // The group types list doesn't allowed to use in cross-posting.
+    $form['cross_posting']['group_types_disabled'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Disable cross-posting for the group type:'),
+      '#description' => $this->t('User will not be able to cross post a content for selected group types.'),
+      '#options' => $this->getGroupTypesOptions(),
+      '#default_value' => $config->get('cross_posting.group_types_disabled') ?? [],
+      '#states' => [
+        'visible' => [
+          ':input[name="cross_posting[status]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
     // Add an option for site manager to enable/disable option to choose group
     // type on page to add flexible groups.
     if (\Drupal::moduleHandler()->moduleExists('social_group_flexible_group')) {
@@ -193,7 +207,10 @@ class SocialGroupSettings extends ConfigFormBase {
       ? Checkboxes::getCheckedCheckboxes($form_state->getValue(['cross_posting', 'content_types']))
       : []
     );
-
+    $config->set('cross_posting.group_types_disabled', $cross_posting_status
+      ? Checkboxes::getCheckedCheckboxes($form_state->getValue(['cross_posting', 'group_types_disabled']))
+      : []
+    );
     $config->set('default_hero', $form_state->getValue('default_hero'));
     $config->set('social_group_type_required', $form_state->getValue('social_group_type_required'));
     $config->save();
@@ -258,6 +275,21 @@ class SocialGroupSettings extends ConfigFormBase {
         $node_type = $this->entityTypeManager->getStorage('node_type')->load($bundle);
         $options[$bundle] = $node_type->label();
       }
+    }
+
+    return $options ?? [];
+  }
+
+  /**
+   * Returns group types list options.
+   *
+   * @return array
+   *   An array with options.
+   */
+  private function getGroupTypesOptions() {
+    $group_types = $this->entityTypeManager->getStorage('group_type')->loadMultiple();
+    foreach ($group_types as $id => $group_type) {
+      $options[$id] = $group_type->label();
     }
 
     return $options ?? [];
