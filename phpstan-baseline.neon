@@ -5081,7 +5081,7 @@ parameters:
 			path: src/Installer/OptionalModuleManager.php
 
 		-
-			message: "#^Parameter \\#2 $value of method Drupal\\\\Core\\\\Database\\\\Query\\\\ConditionInterface\\:\\:condition\\(\\) expects array\\|Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface\\|string\\|null, int given\\.$#"
+			message: "#^Parameter \\#2 \\$value of method Drupal\\\\Core\\\\Database\\\\Query\\\\ConditionInterface\\:\\:condition\\(\\) expects array\\|Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface\\|string\\|null, int given\\.$#"
 			count: 1
 			path: modules/social_features/social_activity/src/Plugin/views/filter/AggregateNotificationsGroupContent.php
 
@@ -5091,11 +5091,11 @@ parameters:
 			path: modules/social_features/social_activity/src/Plugin/views/filter/AggregateNotificationsGroupContent.php
 
 		-
-			message: "#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)$#"
+			message: "#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#"
 			count: 1
 			path: modules/custom/activity_basics/src/Plugin/ActivityContext/GroupActivityContext.php
 
 		-
-			message: "#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:hasField\\(\\)$#"
+			message: "#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:hasField\\(\\)\\.$#"
 			count: 1
 			path: modules/custom/activity_basics/src/Plugin/ActivityContext/GroupActivityContext.php
