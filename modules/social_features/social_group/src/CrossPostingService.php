@@ -40,7 +40,7 @@ class CrossPostingService {
   /**
    * The Group storage.
    *
-   * @var \Drupal\Core\entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $groupStorage;
 

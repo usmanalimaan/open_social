@@ -587,7 +587,7 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Drupal\\\\views\\\\Plugin\\\\views\\\\query\\\\QueryPluginBase\\:\\:addRelationship\\(\\)\\.$#"
-			count: 4
+			count: 5
 			path: modules/custom/activity_viewer/src/Plugin/views/filter/ActivityPostVisibilityAccess.php
 
 		-
@@ -5079,4 +5079,13 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: src/Installer/OptionalModuleManager.php
+
+        -
+            message: "Parameter #2 $value of method Drupal\Core\Database\Query\ConditionInterface::condition() expects array|Drupal\Core\Database\Query\SelectInterface|string|null, int given"
+         	count: 1
+         	path: modules/social_features/social_activity/src/Plugin/views/filter/AggregateNotificationsGroupContent.php
+        -
+            message: "Call to an undefined method Drupal\views\Plugin\views\query\QueryPluginBase::addWhere()"
+         	count: 1
+         	path: modules/social_features/social_activity/src/Plugin/views/filter/AggregateNotificationsGroupContent.php
 

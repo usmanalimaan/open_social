@@ -101,7 +101,7 @@ class GroupActivityContext extends ActivityContextBase {
   /**
    * {@inheritdoc}
    */
-  public function isValidEntity(EntityInterface $entity) {
+  public function isValidEntity($entity) {
     // Special cases for comments.
     if ($entity->getEntityTypeId() === 'comment') {
       // Returns the entity to which the comment is attached.
@@ -115,7 +115,7 @@ class GroupActivityContext extends ActivityContextBase {
     }
 
     if ($entity->getEntityTypeId() === 'post') {
-      if (!$entity->get('field_recipient_group')->isEmpty()) {
+      if (!$entity->field_recipient_group->isEmpty()) {
         return TRUE;
       }
     }
