@@ -101,7 +101,7 @@ class GroupActivityContext extends ActivityContextBase {
   /**
    * {@inheritdoc}
    */
-  public function isValidEntity($entity) {
+  public function isValidEntity(EntityInterface $entity) {
     // Special cases for comments.
     if ($entity->getEntityTypeId() === 'comment') {
       // Returns the entity to which the comment is attached.
