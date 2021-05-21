@@ -115,7 +115,7 @@ class GroupActivityContext extends ActivityContextBase {
     }
 
     if ($entity->getEntityTypeId() === 'post') {
-      if (!$entity->field_recipient_group->isEmpty()) {
+      if ($entity->hasField('field_recipient_group') && !$entity->get('field_recipient_group')->isEmpty()) {
         return TRUE;
       }
     }
