@@ -3,13 +3,9 @@
 namespace Drupal\social_activity\Plugin\ActivityEntityCondition;
 
 use Drupal\activity_creator\Plugin\ActivityEntityConditionBase;
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\group\Entity\GroupContentInterface;
-use Drupal\group\Plugin\GroupContentEnablerManagerInterface;
 use Drupal\social_group\CrossPostingService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use function MongoDB\Driver\Monitoring\removeSubscriber;
 
 /**
  * Provides a 'GroupContentFirstActivityEntityCondition' activity condition.

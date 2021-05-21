@@ -5,4 +5,4 @@ default_hero: null
 cross_posting:
   status: false
   content_types: {  }
-  group_types_disabled: {  }
+  group_types: {  }

@@ -1279,7 +1279,7 @@ function _social_group_node_form_cross_posting_validate(array $form, FormStateIn
     return;
   }
   // No group types disabled for cross-posting.
-  if (!($disabled_groups = $group_settings->get('cross_posting.group_types_disabled'))) {
+  if (!($disabled_groups = $group_settings->get('cross_posting.group_types'))) {
     return;
   }
 

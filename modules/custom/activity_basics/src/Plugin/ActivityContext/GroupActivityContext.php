@@ -120,7 +120,7 @@ class GroupActivityContext extends ActivityContextBase {
       }
     }
 
-    // Check if it's placed in a group (regardless off content type).
+    // Check if the content is placed in a group (regardless of content type).
     /** @var \Drupal\group\Entity\GroupContentInterface $entity */
     if (GroupContent::loadByEntity($entity)) {
       return TRUE;

@@ -14,19 +14,19 @@ use Drupal\node\NodeInterface;
  * Implements hook_token_info().
  */
 function social_activity_token_info() {
-  $message['additional_information'] = [
+  $tokens['additional_information'] = [
     'name' => t('Additional information.'),
     'description' => t('Additional message information.'),
   ];
 
-  $message['count_groups_per_node'] = [
+  $tokens['count_groups_per_node'] = [
     'name' => t('Groups count per node.'),
     'description' => t('Number of groups where node is added.'),
   ];
 
   return [
     'tokens' => [
-      'message' => $message,
+      'message' => $tokens,
     ],
   ];
 }
@@ -127,7 +127,7 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
 
               // Build the string like "(+ 4 groups more)".
               $replacements[$original] = $count
-                ? '(+ ' . $count . ' ' . ($count > 1 ? t('groups') : t('group'))->render() . '  more)'
+                ? '(+ ' . $count . ' ' . ($count > 1 ? t('groups') : t('group'))->render() . ' ' . t('more')->render() . ')'
                 : '';
             }
           }

@@ -157,12 +157,12 @@ class SocialGroupSettings extends ConfigFormBase {
     ];
 
     // The group types list doesn't allowed to use in cross-posting.
-    $form['cross_posting']['group_types_disabled'] = [
+    $form['cross_posting']['group_types'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Disable cross-posting for the group type:'),
       '#description' => $this->t('User will not be able to cross post a content for selected group types.'),
       '#options' => $this->getGroupTypesOptions(),
-      '#default_value' => $config->get('cross_posting.group_types_disabled') ?? [],
+      '#default_value' => $config->get('cross_posting.group_types') ?? [],
       '#states' => [
         'visible' => [
           ':input[name="cross_posting[status]"]' => ['checked' => TRUE],
@@ -207,8 +207,8 @@ class SocialGroupSettings extends ConfigFormBase {
       ? Checkboxes::getCheckedCheckboxes($form_state->getValue(['cross_posting', 'content_types']))
       : []
     );
-    $config->set('cross_posting.group_types_disabled', $cross_posting_status
-      ? Checkboxes::getCheckedCheckboxes($form_state->getValue(['cross_posting', 'group_types_disabled']))
+    $config->set('cross_posting.group_types', $cross_posting_status
+      ? Checkboxes::getCheckedCheckboxes($form_state->getValue(['cross_posting', 'group_types']))
       : []
     );
     $config->set('default_hero', $form_state->getValue('default_hero'));
