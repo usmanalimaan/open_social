@@ -40,25 +40,25 @@ class CrossPostingService {
   /**
    * The Group storage.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var \Drupal\Core\entity\EntityStorageInterface
    */
   protected $groupStorage;
 
   /**
    * Constructs a GroupContentMultipleActivityEntityCondition object.
    *
-   * @param \Drupal\group\Plugin\GroupContentEnablerManagerInterface $group_content_plugin_manager
-   *   The group content enabler manager.
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity manager.
+   * @param \Drupal\Core\Database\Connection $database
+   *   The database connection.
+   * @param \Drupal\group\Plugin\GroupContentEnablerManagerInterface $group_content_plugin_manager
+   *   The group content enabler manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager,  GroupContentEnablerManagerInterface $group_content_plugin_manager, Connection $database) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, Connection $database, GroupContentEnablerManagerInterface $group_content_plugin_manager) {
     $this->entityTypeManager = $entity_type_manager;
-    $this->groupContentManager = $group_content_plugin_manager;
-    $this->database = $database;
     $this->groupStorage = $entity_type_manager->getStorage('group');
+    $this->database = $database;
+    $this->groupContentManager = $group_content_plugin_manager;
   }
 
   /**
@@ -165,7 +165,7 @@ class CrossPostingService {
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   Entity object.
    *
-   * @return integer
+   * @return int
    *   Returns groups count.
    */
   public function countGroupsByGroupContentNode(ContentEntityInterface $entity): int {
@@ -185,7 +185,7 @@ class CrossPostingService {
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   Entity object.
    *
-   * @return boolean
+   * @return bool
    *   Returns flag if node exists in multiple groups.
    */
   public function nodeExistsInMultipleGroups(ContentEntityInterface $entity): bool {

@@ -31,6 +31,12 @@ class GroupContentMultipleActivityEntityCondition extends ActivityEntityConditio
   /**
    * Constructs a GroupContentMultipleActivityEntityCondition object.
    *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
    * @param \Drupal\social_group\CrossPostingService $cross_posting_service
    *   The group content enabler manager.
    */
@@ -63,4 +69,5 @@ class GroupContentMultipleActivityEntityCondition extends ActivityEntityConditio
 
     return FALSE;
   }
+
 }

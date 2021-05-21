@@ -50,8 +50,8 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
             $replacements[$original] = '';
             $summary = '';
 
-            $target_type = $message->field_message_related_object->target_type;
-            $target_id = $message->field_message_related_object->target_id;
+            $target_type = $message->get('field_message_related_object')->getValue()[0]['target_type'];
+            $target_id = $message->get('field_message_related_object')->getValue()[0]['target_id'];
 
             $entity = \Drupal::entityTypeManager()->getStorage($target_type)
               ->load($target_id);
@@ -115,8 +115,8 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
 
         case 'count_groups_per_node':
           if (!$message->get('field_message_related_object')->isEmpty()) {
-            $target_type = $message->get('field_message_related_object')->target_type;
-            $target_id = $message->get('field_message_related_object')->target_id;
+            $target_type = $message->get('field_message_related_object')->getValue()[0]['target_type'];
+            $target_id = $message->get('field_message_related_object')->getValue()[0]['target_id'];
 
             if ($entity = \Drupal::entityTypeManager()
               ->getStorage($target_type)

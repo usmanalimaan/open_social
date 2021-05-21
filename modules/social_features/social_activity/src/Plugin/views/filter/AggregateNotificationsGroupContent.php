@@ -6,6 +6,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\group\Plugin\GroupContentEnablerManagerInterface;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
  * Filter duplicate notifications created on group content insert.
@@ -24,6 +25,13 @@ class AggregateNotificationsGroupContent extends FilterPluginBase {
   protected $database;
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * The group content enabler manager.
    *
    * @var \Drupal\group\Plugin\GroupContentEnablerManagerInterface
@@ -33,9 +41,10 @@ class AggregateNotificationsGroupContent extends FilterPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database, GroupContentEnablerManagerInterface $group_content_enabler_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database, ConfigFactoryInterface $config_factory, GroupContentEnablerManagerInterface $group_content_enabler_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->database = $database;
+    $this->configFactory = $config_factory;
     $this->groupContentEnablerManager = $group_content_enabler_manager;
   }
 
@@ -43,7 +52,14 @@ class AggregateNotificationsGroupContent extends FilterPluginBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('database'), $container->get('plugin.manager.group_content_enabler'));
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('database'),
+      $container->get('config.factory'),
+      $container->get('plugin.manager.group_content_enabler')
+    );
   }
 
   /**
@@ -57,8 +73,8 @@ class AggregateNotificationsGroupContent extends FilterPluginBase {
    * Filters out activity items by the taxonomy tags.
    */
   public function query() {
-    // We want to apply this filter if cross-posting is enabled
-    if (!\Drupal::config('social_group.settings')->get('cross_posting.status')) {
+    // We want to apply this filter if cross-posting is enabled.
+    if (!$this->configFactory->get('social_group.settings')->get('cross_posting.status')) {
       return;
     }
 
@@ -115,4 +131,5 @@ class AggregateNotificationsGroupContent extends FilterPluginBase {
 
     $this->query->addWhere(0, 'id', $aids ?: [0], 'NOT IN');
   }
+
 }

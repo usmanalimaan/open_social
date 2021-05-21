@@ -115,12 +115,13 @@ class GroupActivityContext extends ActivityContextBase {
     }
 
     if ($entity->getEntityTypeId() === 'post') {
-      if (!$entity->field_recipient_group->isEmpty()) {
+      if (!$entity->get('field_recipient_group')->isEmpty()) {
         return TRUE;
       }
     }
 
     // Check if it's placed in a group (regardless off content type).
+    /** @var \Drupal\group\Entity\GroupContentInterface $entity */
     if (GroupContent::loadByEntity($entity)) {
       return TRUE;
     }

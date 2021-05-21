@@ -8,7 +8,7 @@ services:
     arguments: ['@database']
   social_group.cross_posting:
     class: Drupal\social_group\CrossPostingService
-    arguments: [ '@entity_type.manager', '@plugin.manager.group_content_enabler', '@database']
+    arguments: ['@entity_type.manager', '@database', '@plugin.manager.group_content_enabler']
   social_group.set_groups_for_node_service:
     class: Drupal\social_group\SetGroupsForNodeService
     arguments: ['@entity_type.manager', '@module_handler']
