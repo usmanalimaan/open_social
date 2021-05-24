@@ -105,7 +105,7 @@ class GroupActivityContext extends ActivityContextBase {
     // Special cases for comments.
     if ($entity->getEntityTypeId() === 'comment') {
       // Returns the entity to which the comment is attached.
-      if ($entity->getCommentedEntity()) {
+      if (!$entity->getCommentedEntity()) {
         return FALSE;
       }
     }
