@@ -304,7 +304,12 @@ function social_activity_update_8902() {
   ];
   foreach ($config_names as $name) {
     $config = $config_factory->getEditable($name);
+    // Update template text.
+    $updated_text = $source->read($name)['text'];
+    $config->set('text', $updated_text);
+    // Remove redundant destination.
     $config->clear('third_party_settings.activity_logger.activity_destinations.stream_group');
+
     $config->save();
   }
 }
