@@ -301,7 +301,9 @@ function social_activity_update_8902() {
     'message.template.create_event_group',
     'message.template.create_topic_group',
     'message.template.moved_content_between_groups',
+    'message.template.create_content_in_joined_group',
   ];
+
   foreach ($config_names as $name) {
     $config = $config_factory->getEditable($name);
     // Update template text.

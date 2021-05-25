@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @ActivityEntityCondition(
  *  id = "group_content_node_single_group",
- *  label = @Translation("Node exists in single group"),
+ *  label = @Translation("Node added in the first (single) group"),
  *  entities = {"group_content" = {}}
  * )
  */
