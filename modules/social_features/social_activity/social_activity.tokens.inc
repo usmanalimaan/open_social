@@ -124,7 +124,7 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
               // For the moment we can count only for group_content and node entities.
               $count = \Drupal::service('social_group.cross_posting')
                 ->countGroupsByGroupContentNode($entity);
-              // Recount as token renders in group context and we need to 
+              // Recount as token renders in group context and we need to
               // exclude the one.
               $count = $count ? $count - 1 : $count;
               // Build the string like "(+ 4 groups more)".
