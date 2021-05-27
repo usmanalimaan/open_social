@@ -291,7 +291,6 @@ class SocialGroupFlexibleGroupConfigOverride implements ConfigFactoryOverrideInt
 
     $config_names = [
       'message.template.create_content_in_joined_group',
-      'message.template.create_content_in_joined_groups',
     ];
 
     foreach ($config_names as $config_name) {
