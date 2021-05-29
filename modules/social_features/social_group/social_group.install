@@ -130,6 +130,7 @@ function _social_group_get_permissions($role) {
     'view node.page.field_content_visibility:group content',
     'access group overview',
     'edit group types',
+    'access cross-group posting',
   ]);
 
   // Site manager.
@@ -626,8 +627,8 @@ function social_group_update_8906() {
   $config->save();
 
   // Grand roles to use cross-posting feature.
-  foreach (['authenticated', 'sitemanager', 'contentmanager', 'administrator'] as $role_id) {
-    user_role_grant_permissions($role_id, ['access cross-posting group content']);
+  foreach (['sitemanager', 'contentmanager'] as $role_id) {
+    user_role_grant_permissions($role_id, ['access cross-group posting']);
   }
 
   // Install new configs.

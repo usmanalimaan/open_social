@@ -20,6 +20,7 @@ use Drupal\group\Entity\Group;
 use Drupal\group\Plugin\GroupContentEnablerManager;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * A widget to select a group when creating an entity in a group.
@@ -38,6 +39,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SocialGroupSelectorWidget extends OptionsSelectWidget implements ContainerFactoryPluginInterface {
 
+  use StringTranslationTrait;
+  
   /**
    * The list of options.
    *
@@ -202,7 +205,8 @@ class SocialGroupSelectorWidget extends OptionsSelectWidget implements Container
     // Disable multi-selection if cross-posting is disabled or current entity
     // type isn't in the allowed list.
     $sg_settings = $this->configFactory->get('social_group.settings');
-    $disable_multi_selection = !$sg_settings->get('cross_posting.status')
+    $disable_multi_selection = !$this->currentUser->hasPermission('access cross-group posting')
+      || !$sg_settings->get('cross_posting.status')
       || !in_array($items->getEntity()->bundle(), $sg_settings->get('cross_posting.content_types'), TRUE);
 
     if ($disable_multi_selection) {
@@ -221,11 +225,17 @@ class SocialGroupSelectorWidget extends OptionsSelectWidget implements Container
       }
     }
     else {
-      $has_required_permissions = ($sg_settings->get('cross_posting.status') && $this->currentUser->hasPermission('access cross-posting group content'))
-        || $this->currentUser->hasPermission('manage all groups');
-      if (!$change_group_node && !$has_required_permissions) {
+      if (!$change_group_node && !$this->currentUser->hasPermission('manage all groups')) {
         $element['#disabled'] = TRUE;
-        $element['#description'] = t('Moving content after creation function has been disabled. In order to move this content, please contact a site manager.');
+        $element['#description'] = $this->t('Moving content after creation function has been disabled. In order to move this content, please contact a site manager.');
+      }
+    }
+
+    // We don't allow to LU to edit field if there are multiple values.
+    if (count($element['#default_value']) > 1) {
+      if ($sg_settings->get('cross_posting.status') && !$this->currentUser->hasPermission('access cross-group posting')) {
+        $element['#disabled'] = TRUE;
+        $element['#description'] = $this->t('You are not allowed to edit this field!');
       }
     }
 
