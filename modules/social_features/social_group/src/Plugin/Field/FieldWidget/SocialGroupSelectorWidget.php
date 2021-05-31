@@ -40,7 +40,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 class SocialGroupSelectorWidget extends OptionsSelectWidget implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;
-  
+
   /**
    * The list of options.
    *
