@@ -259,14 +259,13 @@ function social_group_preprocess_group(array &$variables) {
     // @todo switch this to get URL from routes correctly.
     $variables['group_operations_url'] = Url::fromRoute('entity.group.join', ['group' => $group->id()]);
 
-    if (in_array($group_type_id, $group_types)) {
-      $join_methods = $group->get('field_group_allowed_join_method')->getValue();
-      $direct_option = in_array('direct', array_column($join_methods, 'value'), FALSE);
-      if (!$direct_option) {
-        $variables['group_operations_url'] = Url::fromRoute('entity.group.join', ['group' => $group->id()]);
-        $variables['closed_group'] = TRUE;
-        $variables['cta'] = t('Invitation only');
-      }
+    if (
+      in_array($group_type_id, $group_types) &&
+      !social_group_flexible_group_can_join_directly($group)
+    ) {
+      $variables['group_operations_url'] = Url::fromRoute('entity.group.join', ['group' => $group->id()]);
+      $variables['closed_group'] = TRUE;
+      $variables['cta'] = t('Invitation only');
     }
   }
   // If the group type is a closed_group.
@@ -275,6 +274,15 @@ function social_group_preprocess_group(array &$variables) {
     $variables['group_operations_url'] = Url::fromRoute('entity.group.join', ['group' => $group->id()]);
     $variables['closed_group'] = TRUE;
     $variables['cta'] = t('Invitation only');
+  }
+  // Non logged in users should still see "join" button on a group page.
+  if (
+    $account->isAnonymous() &&
+    (in_array($group_type_id, $group_types) &&
+    social_group_flexible_group_can_join_directly($group) ||
+    in_array($group_type_id, ['public_group']))
+  ) {
+    $variables['group_operations_url'] = Url::fromRoute('entity.group.join', ['group' => $group->id()]);
   }
 
   // Add the hero styled image.
@@ -1321,11 +1329,10 @@ function _social_group_node_form_submit(array $form, FormStateInterface $form_st
  * Implements hook_field_widget_form_alter().
  */
 function social_group_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
-
   /** @var \Drupal\Core\Field\FieldDefinitionInterface $field_definition */
   $field_definition = $context['items']->getFieldDefinition();
 
-  // Unset the public options on visibility field.
+  // Unset the visibility field options which are not enabled.
   if ($field_definition->getType() == 'entity_access_field') {
     $default_value = $context['items']->getValue();
     if (isset($default_value[0]['value'])) {
@@ -1342,6 +1349,8 @@ function social_group_field_widget_form_alter(&$element, FormStateInterface $for
     if (!empty($current_group)) {
       $group_type = $current_group->getGroupType();
       $group_type_id = $group_type->id();
+      // If it's an existing entity we dont need to set the default
+      // rather follow the saved one.
       if (!$entity->id()) {
         $element['#default_value'] = \Drupal::service('social_group.helper_service')->getDefaultGroupVisibility($group_type_id);
       }
@@ -1357,8 +1366,38 @@ function social_group_field_widget_form_alter(&$element, FormStateInterface $for
     foreach ($visibility_options as $visibility => $allowed) {
       $element[$visibility]['#disabled'] = !$allowed;
     }
-  }
 
+    // This contains the group that is passed back from the form_state as
+    // chosen by selecting a group in the $form['groups'] select widget.
+    // With this we can ensure that on validation the content visibility
+    // field is disabling the correct values based on the selected group.
+    if (!empty($form_state->getValue('groups'))) {
+      $group_id = NULL;
+      $group_value = $form_state->getValue('groups');
+      if (is_array($group_value)) {
+        $group_id = $group_value[0]['target_id'];
+      }
+      if (is_string($group_value)) {
+        $group_id = (int) $group_value;
+      }
+      // Load the correct group.
+      $selected_groups = Group::loadMultiple([$group_id]);
+
+      // Ensure we disable the correct visibility options.
+      foreach ($selected_groups as $current_group) {
+        if (!empty($current_group)) {
+          $group_type = $current_group->getGroupType();
+          $group_type_id = $group_type->id();
+
+          $visibility_options = social_group_get_allowed_visibility_options_per_group_type($group_type_id, NULL, NULL, $current_group);
+
+          foreach ($visibility_options as $visibility => $allowed) {
+            $element[$visibility]['#disabled'] = !$allowed;
+          }
+        }
+      }
+    }
+  }
 }
 
 /**
