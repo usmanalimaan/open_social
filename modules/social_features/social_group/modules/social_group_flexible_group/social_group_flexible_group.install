@@ -366,9 +366,29 @@ function social_group_flexible_group_update_8910(&$sandbox) {
 }
 
 /**
+ * Make group creators as a group managers by default.
+ */
+function social_group_flexible_group_update_8911() {
+  $config_factory = \Drupal::configFactory();
+  $group_type = 'flexible_group';
+
+  $config = $config_factory->getEditable('group.type.' . $group_type);
+  $config->set('creator_membership', TRUE);
+
+  $creator_roles = $config->get('creator_roles');
+  $group_role_id = $group_type . '-group_manager';
+  if (!in_array($group_role_id, $creator_roles)) {
+    $creator_roles[] = $group_role_id;
+    $config->set('creator_roles', $creator_roles);
+  }
+
+  $config->save(TRUE);
+}
+
+/**
  * Install display view modes for group contents for Flexible group type.
  */
-function social_group_flexible_group_update_8911(&$sandbox) {
+function social_group_flexible_group_update_8912(&$sandbox) {
   // Install new configs.
   $config_path = drupal_get_path('module', 'social_group_flexible_group') . '/config/install';
   $source = new FileStorage($config_path);

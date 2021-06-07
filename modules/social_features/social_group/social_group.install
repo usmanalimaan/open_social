@@ -618,9 +618,36 @@ function social_group_update_8905() {
 }
 
 /**
- * Set the default group configuration for cross-posting settings.
+ * Make group creators as a group managers by default.
  */
 function social_group_update_8906() {
+  $config_factory = \Drupal::configFactory();
+
+  $group_types = [
+    'public_group',
+    'open_group',
+    'closed_group',
+  ];
+
+  foreach ($group_types as $group_type) {
+    $config = $config_factory->getEditable('group.type.' . $group_type);
+    $config->set('creator_membership', TRUE);
+
+    $creator_roles = $config->get('creator_roles');
+    $group_role_id = $group_type . '-group_manager';
+    if (!in_array($group_role_id, $creator_roles)) {
+      $creator_roles[] = $group_role_id;
+      $config->set('creator_roles', $creator_roles);
+    }
+
+    $config->save(TRUE);
+  }
+}
+
+/**
+ * Set the default group configuration for cross-posting settings.
+ */
+function social_group_update_8907() {
   $config = \Drupal::configFactory()->getEditable('social_group.settings');
   $config->set('cross_posting.status', FALSE);
   $config->set('cross_posting.content_types', []);
