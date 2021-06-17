@@ -645,9 +645,23 @@ function social_group_update_8906() {
 }
 
 /**
- * Set the default group configuration for cross-posting settings.
+ * Add translation compatibility for Event fields and views.
  */
 function social_group_update_8907() {
+  /** @var \Drupal\update_helper\Updater $updateHelper */
+  $updateHelper = \Drupal::service('update_helper.updater');
+
+  // Execute configuration update definitions with logging of success.
+  $updateHelper->executeUpdate('social_group', 'social_group_update_8907');
+
+  // Output logged messages to related channel of update execution.
+  return $updateHelper->logger()->output();
+}
+
+/**
+ * Set the default group configuration for cross-posting settings.
+ */
+function social_group_update_8908() {
   $config = \Drupal::configFactory()->getEditable('social_group.settings');
   $config->set('cross_posting.status', FALSE);
   $config->set('cross_posting.content_types', []);

@@ -386,9 +386,23 @@ function social_group_flexible_group_update_8911() {
 }
 
 /**
+ * Make group creators as a group managers by default.
+ */
+function social_group_flexible_group_update_8912() {
+  /** @var \Drupal\update_helper\Updater $updateHelper */
+  $updateHelper = \Drupal::service('update_helper.updater');
+
+  // Execute configuration update definitions with logging of success.
+  $updateHelper->executeUpdate('social_group_flexible_group', 'social_group_flexible_group_update_8912');
+
+  // Output logged messages to related channel of update execution.
+  return $updateHelper->logger()->output();
+}
+
+/**
  * Install display view modes for group contents for Flexible group type.
  */
-function social_group_flexible_group_update_8912(&$sandbox) {
+function social_group_flexible_group_update_8913(&$sandbox) {
   // Install new configs.
   $config_path = drupal_get_path('module', 'social_group_flexible_group') . '/config/install';
   $source = new FileStorage($config_path);
