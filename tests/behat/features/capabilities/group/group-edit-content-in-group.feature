@@ -58,6 +58,7 @@ Feature: Move content after creation
     And I wait for AJAX to finish
     And I press "Save"
     Then I should see "Motorboats"
+    And I wait for the queue to be empty
 
     When I am logged in as "harry"
     And I am on the stream of group "Motorboats"
