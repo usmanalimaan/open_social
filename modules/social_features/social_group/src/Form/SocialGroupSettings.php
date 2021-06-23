@@ -147,6 +147,7 @@ class SocialGroupSettings extends ConfigFormBase {
     $form['cross_posting']['content_types'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Content types'),
+      '#description' => $this->t('Enable cross-group posting for node types'),
       '#options' => $this->getCrossPostingEntityTypesOptions(),
       '#default_value' => $config->get('cross_posting.content_types') ?? [],
       '#states' => [
@@ -156,11 +157,17 @@ class SocialGroupSettings extends ConfigFormBase {
       ],
     ];
 
-    // The group types list doesn't allowed to use in cross-posting.
+    // The group types list allowed to use in cross-posting.
     $form['cross_posting']['group_types'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Disable cross-posting for the group type:'),
-      '#description' => $this->t('User will not be able to cross post a content for selected group types.'),
+      '#title' => $this->t('Group types'),
+      '#description' => $this->t('This option allows to control on 
+        content adding/editing which group types can be used for cross-group 
+        posting. It depends on "Content types" options. For example, if you 
+        chose "Topic" on "Content type" option and want to have cross-group 
+        posting this topic in "Flexible group" and "Open group" just select them. For 
+        other group types cross-posting will be disabled.'
+      ),
       '#options' => $this->getGroupTypesOptions(),
       '#default_value' => $config->get('cross_posting.group_types') ?? [],
       '#states' => [

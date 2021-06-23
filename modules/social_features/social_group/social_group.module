@@ -1209,10 +1209,8 @@ function _social_group_node_form_cross_posting_validate(array $form, FormStateIn
   if (!$group_settings->get('cross_posting.status')) {
     return;
   }
-  // No group types disabled for cross-posting.
-  if (!($disabled_groups = $group_settings->get('cross_posting.group_types'))) {
-    return;
-  }
+  // Check if group type enabled for cross-group posting.
+  $allowed_group_types = $group_settings->get('cross_posting.group_types');
 
   $values = $form_state->getValue('groups');
   // We need to check only if user try to add a node to multiple groups.
@@ -1220,7 +1218,7 @@ function _social_group_node_form_cross_posting_validate(array $form, FormStateIn
     $gids = array_column($values, 'target_id');
     foreach (Group::loadMultiple($gids) as $group) {
       // If the group type for the group is not allowed - raise the error.
-      if (in_array($group->getGroupType()->id(), $disabled_groups)) {
+      if (!in_array($group->getGroupType()->id(), $allowed_group_types)) {
         $form_state->setErrorByName('groups', t('Cross posting is not allowed for @type group type', [
           '@type' => $group->getGroupType()->label(),
         ]));
