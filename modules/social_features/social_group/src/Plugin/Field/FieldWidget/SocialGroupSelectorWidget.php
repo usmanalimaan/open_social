@@ -12,7 +12,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsSelectWidget;
+use Drupal\select2\Plugin\Field\FieldWidget\Select2EntityReferenceWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -37,7 +37,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  *   multiple_values = TRUE
  * )
  */
-class SocialGroupSelectorWidget extends OptionsSelectWidget implements ContainerFactoryPluginInterface {
+class SocialGroupSelectorWidget extends Select2EntityReferenceWidget implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;
 
