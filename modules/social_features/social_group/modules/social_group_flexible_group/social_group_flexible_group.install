@@ -402,7 +402,7 @@ function social_group_flexible_group_update_8912() {
 /**
  * Install display view modes for group contents for Flexible group type.
  */
-function social_group_flexible_group_update_8913(&$sandbox) {
+function social_group_flexible_group_update_10301(&$sandbox) {
   // Install new configs.
   $config_path = drupal_get_path('module', 'social_group_flexible_group') . '/config/install';
   $source = new FileStorage($config_path);

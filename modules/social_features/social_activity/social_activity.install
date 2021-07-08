@@ -265,12 +265,12 @@ function social_activity_update_8807() {
 /**
  * Add a new filter to "notifications" view.
  */
-function social_activity_update_8901() {
+function social_activity_update_10301() {
   /** @var \Drupal\update_helper\Updater $updateHelper */
   $updateHelper = \Drupal::service('update_helper.updater');
 
   // Execute configuration update definitions with logging of success.
-  $updateHelper->executeUpdate('social_activity', 'social_activity_update_8901');
+  $updateHelper->executeUpdate('social_activity', 'social_activity_update_10301');
 
   // Output logged messages to related channel of update execution.
   return $updateHelper->logger()->output();
