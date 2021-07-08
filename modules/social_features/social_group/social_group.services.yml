@@ -5,7 +5,7 @@ services:
       - { name: event_subscriber }
   social_group.helper_service:
     class: Drupal\social_group\SocialGroupHelperService
-    arguments: ['@database']
+    arguments: ['@database', '@module_handler']
   social_group.cross_posting:
     class: Drupal\social_group\CrossPostingService
     arguments: ['@entity_type.manager', '@database', '@plugin.manager.group_content_enabler']
