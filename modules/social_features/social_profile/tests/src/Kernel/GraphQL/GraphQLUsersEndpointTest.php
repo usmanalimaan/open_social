@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\social_profile\Kernel;
+namespace Drupal\Tests\social_profile\Kernel\GraphQL;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\profile\Entity\ProfileInterface;
@@ -100,28 +100,30 @@ class GraphQLUsersEndpointTest extends SocialGraphQLTestBase {
     $this->setCurrentUser(User::load(1));
     $test_user = $this->createUser();
     $profile = $this->ensureTestProfile($test_user, 'profile');
-    $query = "
-      query {
-        user(id: \"{$test_user->uuid()}\") {
-          profile {
-            firstName
-            lastName
-            introduction {
-              format {
-                name
+
+    $this->assertResults(
+      '
+        query ($id: ID!) {
+          user(id: $id) {
+            profile {
+              firstName
+              lastName
+              introduction {
+                format {
+                  name
+                }
+                raw
+                processed
               }
-              raw
-              processed
+              phone
+              function
+              organization
             }
-            phone
-            function
-            organization
           }
         }
-      }
-    ";
-    $expected_data = [
-      'data' => [
+      ',
+      ['id' => $test_user->uuid()],
+      [
         'user' => [
           'profile' => [
             'firstName' => $profile->get('field_profile_first_name')->first()->getString(),
@@ -139,12 +141,58 @@ class GraphQLUsersEndpointTest extends SocialGraphQLTestBase {
           ],
         ],
       ],
-    ];
+      $this->defaultCacheMetaData()
+        ->addCacheableDependency($test_user)
+        ->addCacheableDependency($profile)
+        ->addCacheContexts(['languages:language_interface'])
+        ->addCacheTags(['profile_list'])
+    );
+  }
 
-    // @todo Move to QueryResultAssertionTrait::assertResults and add metadata.
-    $result = $this->query($query);
-    self::assertSame(200, $result->getStatusCode(), 'user fields are present');
-    self::assertSame($expected_data, json_decode($result->getContent(), TRUE), 'user fields are present');
+  public function testRequiresPermissionForProfileFields() : void {
+    $this->setUpCurrentUser([], ['access user profiles']);
+    $test_user = $this->createUser();
+    $profile = $this->ensureTestProfile($test_user, 'profile');
+
+    $this->assertResults(
+      '
+        query ($id: ID!) {
+          user(id: $id) {
+            profile {
+              firstName
+              lastName
+              introduction {
+                format {
+                  name
+                }
+                raw
+                processed
+              }
+              phone
+              function
+              organization
+            }
+          }
+        }
+      ',
+      ['id' => $test_user->uuid()],
+      [
+        'user' => [
+          'profile' => [
+            'firstName' => NULL,
+            'lastName' => NULL,
+            'introduction' => NULL,
+            'phone' => NULL,
+            'function' => NULL,
+            'organization' => NULL,
+          ],
+        ],
+      ],
+      $this->defaultCacheMetaData()
+        ->addCacheableDependency($test_user)
+        ->addCacheContexts(['languages:language_interface'])
+        ->addCacheTags(['profile_list'])
+    );
   }
 
   /**
