@@ -101,21 +101,6 @@ function social_profile_fields_entity_view_display_alter(EntityViewDisplayInterf
 }
 
 /**
- * Implements hook_form_alter().
- */
-function social_profile_fields_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  $form_object = $form_state->getFormObject();
-
-  if (
-    $form_object instanceof ContentEntityFormInterface &&
-    $form_object->getEntity()->getEntityTypeId() === 'profile' &&
-    isset($form['field_profile_nationality']['widget']['target_id'])
-  ) {
-    $form['field_profile_nationality']['widget']['target_id']['#selection_settings']['hide_id'] = TRUE;
-  }
-}
-
-/**
  * Implements hook_social_user_name_display_suggestions().
  *
  * Adds the nickname as a possible display name.
