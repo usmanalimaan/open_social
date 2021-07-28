@@ -211,12 +211,16 @@ function social_follow_taxonomy_tokens_alter(array &$replacements, array $contex
               // Replace the preview token.
               if (isset($context['tokens']['preview'])) {
                 $preview_info = [];
-                if ($entity instanceof NodeInterface) {
-                  /** @var \Drupal\node\Entity\Node $entity */
-                  $preview_info = $email_token_services->getContentPreview($entity);
-                } elseif ($entity instanceof PostInterface) {
-                  // Get the summary of the post.
-                  $preview_info = $email_token_services->getPostPreview($entity);
+                switch ($entity->getEntityTypeId()) {
+                  case 'node':
+                    /** @var \Drupal\node\Entity\Node $entity */
+                    $preview_info = $email_token_services->getContentPreview($entity);
+                    break;
+                  case 'post':
+                    /** @var \Drupal\social_post\Entity\Post */
+                    $preview_info = $email_token_services->getContentPreview($entity);
+                    break;
+
                 }
                 $replacements[$context['tokens']['preview']] = \Drupal::service('renderer')
                   ->renderPlain($preview_info);
