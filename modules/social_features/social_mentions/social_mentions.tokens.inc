@@ -214,6 +214,7 @@ function social_mentions_tokens_alter(array &$replacements, array $context, Bubb
               }
 
               // Get the comment entity.
+              $comment = NULL;
               if ($comment_field_name && $entity->hasField($comment_field_name)) {
                 $comment_id = $entity->getFieldValue($comment_field_name, 'cid');
                 /** @var Drupal\comment\Entity\Comment $comment */
