@@ -278,7 +278,7 @@ function social_comment_tokens_alter(array &$replacements, array $context, Bubbl
               // Replace the cta_button token value.
               if (isset($context['tokens']['cta_button'])) {
                 /** @var \Drupal\Core\Entity\EntityInterface $commented_entity */
-                $link = $commented_entity->toUrl('canonical', ['absolute' => TRUE])->toString();
+                $link = $commented_entity->toUrl('canonical', ['absolute' => TRUE])->toString() . '#comment-' . $comment->id();
 
                 $cta_button = $email_token_services->getCtaButton($link, 'Reply to this comment');
                 $replacements[$context['tokens']['cta_button']] = \Drupal::service('renderer')->renderPlain($cta_button);

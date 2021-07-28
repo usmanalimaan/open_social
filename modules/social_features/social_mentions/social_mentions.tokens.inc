@@ -5,6 +5,7 @@
  * Builds placeholder replacement tokens for Social Mentions module.
  */
 
+use Drupal\comment\CommentInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\mentions\Entity\Mentions;
 use Drupal\user\Entity\User;
@@ -193,38 +194,65 @@ function social_mentions_tokens_alter(array &$replacements, array $context, Bubb
               }
             }
             if (isset($entity)) {
+              // Prepare comment field name.
+              $comment_field_name = '';
+              $entity_id = $entity->getEntityTypeId();
+              switch ($entity_id) {
+                case 'comment':
+                  $comment_field_name = 'field_comment_body';
+                  break;
+
+                case 'node':
+                  $comment_field_name = 'field_' . $entity->bundle() . '_comments';
+                  break;
+
+                case 'post':
+                case 'photo':
+                  // Get the summary of the comment.
+                  $comment_field_name = 'field_post_comments';
+                  break;
+              }
+
+              // Get the comment entity.
+              if ($comment_field_name && $entity->hasField($comment_field_name)) {
+                $comment_id = $entity->getFieldValue($comment_field_name, 'cid');
+                /** @var Drupal\comment\Entity\Comment $comment */
+                $comment = \Drupal::entityTypeManager()->getStorage('comment')
+                  ->load($comment_id);
+              }
+
+              // Prepare the CTA button.
               if (isset($context['tokens']['cta_button'])) {
                 $link = $entity->toUrl('canonical', ['absolute' => TRUE])->toString();
-                $cta_button = $email_token_services->getCtaButton($link, 'See the comment');
+                // Append the comment reference in link.
+                if ($comment instanceof CommentInterface) {
+                  $link .= '#comment-' . $comment->id();
+                }
+                $cta_button = $email_token_services->getCtaButton($link, 'Reply to this comment');
                 $replacements[$context['tokens']['cta_button']] = \Drupal::service('renderer')
                   ->renderPlain($cta_button);
               }
 
+              // Prepare the comment preview.
               if (isset($context['tokens']['preview'])) {
                 $preview_info = [];
-                // Prepare comment field name.
-                $comment_field_name = '';
-                switch ($entity->getEntityTypeId()) {
+                switch ($entity_id) {
+                  // If the mention was made in a comment on a comment
+                  // or a comment on node.
                   case 'comment':
-                    $comment_field_name = 'field_comment_body';
-                    break;
-
                   case 'node':
-                    $comment_field_name = 'field_' . $entity->bundle() . '_comments';
+                    // Get the summary of the comment.
+                    if ($comment instanceof CommentInterface) {
+                      $preview_info = $email_token_services->getCommentPreview($comment);
+                    }
                     break;
 
+                  // If the mention was made in a post itself.
                   case 'post':
                   case 'photo':
-                    // Get the summary of the comment.
+                    // Get the summary of the post.
                     $preview_info = $email_token_services->getPostPreview($entity);
                     break;
-                }
-                if ($comment_field_name && $entity->hasField($comment_field_name)) {
-                  $comment_id = $entity->getFieldValue($comment_field_name, 'cid');
-                  /** @var Drupal\comment\Entity\Comment $comment */
-                  $comment = \Drupal::entityTypeManager()->getStorage('comment')
-                    ->load($comment_id);
-                  $preview_info = $email_token_services->getCommentPreview($comment);
                 }
                 $replacements[$context['tokens']['preview']] = \Drupal::service('renderer')
                   ->renderPlain($preview_info);

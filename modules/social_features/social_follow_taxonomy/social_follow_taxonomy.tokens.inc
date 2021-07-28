@@ -8,7 +8,6 @@
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
-use Drupal\social_post\Entity\PostInterface;
 use Drupal\taxonomy\TermInterface;
 
 /**
@@ -216,11 +215,11 @@ function social_follow_taxonomy_tokens_alter(array &$replacements, array $contex
                     /** @var \Drupal\node\Entity\Node $entity */
                     $preview_info = $email_token_services->getContentPreview($entity);
                     break;
+
                   case 'post':
                     /** @var \Drupal\social_post\Entity\Post */
                     $preview_info = $email_token_services->getContentPreview($entity);
                     break;
-
                 }
                 $replacements[$context['tokens']['preview']] = \Drupal::service('renderer')
                   ->renderPlain($preview_info);
