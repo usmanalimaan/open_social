@@ -8,6 +8,7 @@
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
+use Drupal\social_post\Entity\PostInterface;
 use Drupal\taxonomy\TermInterface;
 
 /**
@@ -197,6 +198,7 @@ function social_follow_taxonomy_tokens_alter(array &$replacements, array $contex
           /** @var \Drupal\node\Entity\Node $entity */
           $message_template_id = $message->getTemplate()->id();
           switch ($message_template_id) {
+            case 'create_node_following_tag':
             case 'update_node_following_tag':
             case 'create_node_following_tag_stream':
               if (isset($context['tokens']['cta_button'])) {
@@ -208,12 +210,16 @@ function social_follow_taxonomy_tokens_alter(array &$replacements, array $contex
 
               // Replace the preview token.
               if (isset($context['tokens']['preview'])) {
+                $preview_info = [];
                 if ($entity instanceof NodeInterface) {
                   /** @var \Drupal\node\Entity\Node $entity */
                   $preview_info = $email_token_services->getContentPreview($entity);
-                  $replacements[$context['tokens']['preview']] = \Drupal::service('renderer')
-                    ->renderPlain($preview_info);
+                } elseif ($entity instanceof PostInterface) {
+                  // Get the summary of the post.
+                  $preview_info = $email_token_services->getPostPreview($entity);
                 }
+                $replacements[$context['tokens']['preview']] = \Drupal::service('renderer')
+                  ->renderPlain($preview_info);
               }
               break;
           }
