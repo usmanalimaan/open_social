@@ -15,6 +15,7 @@ use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\group\Entity\GroupContentInterface;
@@ -962,6 +963,44 @@ function social_group_form_alter(&$form, FormStateInterface $form_state, $form_i
         }
       }
     }
+  }
+
+  // Add custom validation for "group_type" group field.
+  if (!empty($form['#entity_type']) && $form['#entity_type'] === 'group') {
+    if (isset($form['group_type']) && Element::isVisibleElement($form['group_type'])) {
+      $form['group_type']['#element_validate'][] = '_social_group_cross_posting_group_type_validate';
+    }
+  }
+}
+
+/**
+ * Validation callback checking if group can be converted to another group type.
+ *
+ * @param array $element
+ *   Form element array.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   Form state object.
+ */
+function _social_group_cross_posting_group_type_validate(array $element, FormStateInterface $form_state) {
+  // Cross posting is disabled globally.
+  $group_settings = \Drupal::config('social_group.settings');
+  if (!$group_settings->get('cross_posting.status')) {
+    return;
+  }
+
+  $allowed_group_types = $group_settings->get('cross_posting.group_types');
+
+  $value = $element['widget']['#value'];
+  $previous_value = $element['widget'][$value]['#default_value'];
+  // If the value changed nothing to validate.
+  if ($value === $previous_value) {
+    return;
+  }
+
+  // Allow change "group_type" only for group if the previous and current
+  // group type are using cross-group posting feature.
+  if (in_array($previous_value, $allowed_group_types) && !in_array($value, $allowed_group_types)) {
+    $form_state->setError($element['widget'], t('Cross-group posting for @group_type is disabled', ['@group_type' => $element['widget'][$value]['#title']]));
   }
 }
 
