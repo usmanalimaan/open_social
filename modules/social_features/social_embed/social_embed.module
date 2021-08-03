@@ -7,6 +7,7 @@
 
 use Drupal\Core\File\FileSystemInterface;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\embed\Entity\EmbedButton;
 use Drupal\file\Entity\File;
 
@@ -40,4 +41,107 @@ function social_embed_create_media_button() {
   ]);
   $button->save();
 
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function social_embed_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\Core\Entity\ContentEntityFormInterface $form_object */
+  $form_object = $form_state->getFormObject();
+
+  /** @var \Drupal\social_user\Entity\User $account */
+  $account = $form_object->getEntity();
+
+  /** @var \Drupal\user\UserDataInterface $user_data */
+  $user_data = \Drupal::service('user.data');
+
+  $user_states = $user_data->get('social_embed', $account->id(), 'consent');
+
+  $form['embed_consent'] = [
+    '#type' => 'fieldset',
+    '#title' => [
+      'text' => [
+        '#markup' => t('<strong>Embed consent</strong>'),
+      ],
+      'icon' => [
+        '#markup' => '<svg class="icon icon-expand_more"><use xlink:href="#icon-expand_more" /></svg>',
+        '#allowed_tags' => ['svg', 'use'],
+      ],
+    ],
+    '#tree' => TRUE,
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#attributes' => [
+      'class' => [
+        'form-horizontal',
+        'form-embed-consent',
+      ],
+    ],
+  ];
+
+  $form['embed_consent']['description'] = [
+    '#type' => 'html_tag',
+    '#tag' => 'p',
+    '#value' => t('The following options enables you to choose which embed you would allow in your stream. For example, YouTube videos.'),
+  ];
+
+  $providers = [
+    'facebook' => t('Facebook'),
+    'flickr' => t('Flickr'),
+    'instagram' => t('Instagram'),
+    'spotify' => t('Spotify'),
+    'ted' => t('Ted'),
+    'twitter' => t('Twitter'),
+    'vimeo' => t('Vimeo'),
+  ];
+
+  $form['embed_consent']['fields'] = ['#type' => 'container'];
+
+  foreach ($providers as $key => $title) {
+    $default_value =
+    $form['embed_consent']['fields'][$key] = [
+      '#type' => 'radios',
+      '#title' => $title,
+      '#options' => [
+        1 => t('Show'),
+        0 => t('Hide'),
+      ],
+      '#default_value' => (int) $user_states[$key] ?? 0,
+    ];
+  }
+
+  // Submit function to save send email settings.
+  $form['actions']['submit']['#submit'][] = '_social_embed_form_user_form_submit';
+
+  // Attach library.
+  $form['#attached']['library'][] = 'social_embed/admin';
+}
+
+/**
+ * Save fields visibility options for a user.
+ */
+function _social_embed_form_user_form_submit($form, FormStateInterface $form_state) {
+  /** @var \Drupal\user\UserDataInterface $user_data */
+  $user_data = \Drupal::service('user.data');
+
+  $uid = $form_state->get('account_id');
+  $values = (array) $user_data->get('social_embed', $uid, 'consent');
+
+  // An array with fields, consent settings that have been changed.
+  $updated_fields = [];
+
+  foreach ($form_state->getValue(['embed_consent', 'fields']) as $field => $value) {
+    $values[$field] = $value;
+  }
+
+  $user_data->set('social_embed', $uid, 'consent', $values);
+}
+
+/**
+ * Implements hook_page_attachments_alter().
+ */
+function social_embed_page_attachments_alter(array &$attachments) {
+  // Unconditionally attach an asset to the page.
+  $attachments['#attached']['library'][] = 'social_embed/consent';
 }
