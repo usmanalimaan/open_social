@@ -140,7 +140,8 @@ class SocialEmbedUrlFilter extends ConvertUrlToEmbedFilter {
               try {
                 $info = \Drupal::service('url_embed')->getUrlInfo(Html::decodeEntities($match[1]));
                 if ($info) {
-                  return "<div class='container' id='social-embed-placeholder' data-attribute=$match[1]><div id='social-embed-container'><a class=\"use-ajax\" href='/api/opensocial/social-embed/generate'>Ajax call</a></div></div>";
+                  $image_url = \Drupal::service('social_embed.helper_service')->getEmbedPlaceholderImage();
+                  return "<div class='container' id='social-embed-placeholder' data-social-embed-url=$match[1]><div id='social-embed-container'><a class=\"use-ajax\" href='/api/opensocial/social-embed/generate?url=$match[1]'><img src=\"$image_url\"></a></div></div>";
                 }
                 else {
                   return $match[1];
