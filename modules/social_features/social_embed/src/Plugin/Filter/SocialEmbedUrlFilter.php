@@ -4,6 +4,7 @@ namespace Drupal\social_embed\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\Link;
 use Drupal\filter\FilterProcessResult;
 use Drupal\url_embed\Plugin\Filter\ConvertUrlToEmbedFilter;
 
@@ -139,7 +140,7 @@ class SocialEmbedUrlFilter extends ConvertUrlToEmbedFilter {
               try {
                 $info = \Drupal::service('url_embed')->getUrlInfo(Html::decodeEntities($match[1]));
                 if ($info) {
-                  return "<div class='container' id='social-embed-placeholder' data-attribute=$match[1]><div id='social-embed-container'><button id='social-embed-show-button' type='button'>Show content</button></div></div>";
+                  return "<div class='container' id='social-embed-placeholder' data-attribute=$match[1]><div id='social-embed-container'><a class=\"use-ajax\" href='/api/opensocial/social-embed/generate'>Ajax call</a></div></div>";
                 }
                 else {
                   return $match[1];

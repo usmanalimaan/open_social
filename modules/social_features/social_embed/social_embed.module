@@ -143,5 +143,6 @@ function _social_embed_form_user_form_submit($form, FormStateInterface $form_sta
  */
 function social_embed_page_attachments_alter(array &$attachments) {
   // Unconditionally attach an asset to the page.
-  $attachments['#attached']['library'][] = 'social_embed/consent';
+  // @ TODO we dont need our custom JS for this, we only need Drupal ajax etc.
+//  $attachments['#attached']['library'][] = 'social_embed/consent';
 }

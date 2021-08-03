@@ -11,7 +11,5 @@ social_embed.generate:
   defaults:
     _controller: '\Drupal\social_embed\Controller\EmbedController::generateEmbed'
     _title: 'Generate embed'
-  methods: [POST]
   requirements:
     _access: 'TRUE'
-    _format: json
