@@ -2,6 +2,7 @@
 
 namespace Drupal\social_embed\Controller;
 
+use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Controller\ControllerBase;
@@ -83,11 +84,12 @@ class EmbedController extends ControllerBase {
    */
   public function generateEmbed(Request $request) {
     $url = $request->query->get('url');
-    if ($url == NULL) {
+    $uuid = $request->query->get('uuid');
+    if ($url == NULL && Uuid::isValid($uuid) != FALSE) {
       throw new NotFoundHttpException();
     }
     $response = new AjaxResponse();
-    $selector = '#social-embed-iframe';
+    $selector = "#social-embed-iframe-$uuid";
     if ($info = \Drupal::service('url_embed')->getUrlInfo($url)) {
       $iframe = $info['code'];
       ;
@@ -95,7 +97,7 @@ class EmbedController extends ControllerBase {
     }
     else {
       $link = Link::fromTextAndUrl($url, $url)->toString();
-      $content = "<div id='social-embed-iframe'><p>$link</p></div>";
+      $content = "<div id='social-embed-iframe-$uuid'><p>$link</p></div>";
     }
     $response->addCommand(new ReplaceCommand($selector, $content));
     return $response;

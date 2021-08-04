@@ -4,8 +4,12 @@ namespace Drupal\social_embed\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Component\Uuid\Php;
+use Drupal\Component\Uuid\Uuid;
 use Drupal\filter\FilterProcessResult;
 use Drupal\url_embed\Plugin\Filter\UrlEmbedFilter;
+use Drupal\url_embed\UrlEmbedInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a filter to display embedded URLs based on data attributes.
@@ -18,6 +22,45 @@ use Drupal\url_embed\Plugin\Filter\UrlEmbedFilter;
  * )
  */
 class SocialEmbedUrlEmbedFilter extends UrlEmbedFilter {
+
+  /**
+   * Uuid services.
+   *
+   * @var \Drupal\Component\Uuid\Php
+   */
+  protected Php $uuid;
+
+  /**
+   * Constructs a UrlEmbedFilter object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\url_embed\UrlEmbedInterface $url_embed
+   *   The URL embed service.
+   * @param \Drupal\Component\Uuid\Php $uuid
+   *   The uuid services.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, UrlEmbedInterface $url_embed, Php $uuid) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $url_embed);
+    $this->uuid = $uuid;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('url_embed'),
+      $container->get('uuid')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -34,7 +77,8 @@ class SocialEmbedUrlEmbedFilter extends UrlEmbedFilter {
         $url_output = '';
         try {
           // Replace URL with consent button.
-          $url_output = "<div class='social-embed-container' id='social-embed-placeholder' data-social-embed-url=$url><div id='social-embed-iframe'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$url'>Show content</a></div></div>";
+          $uuid = $this->uuid->generate();
+          $url_output = "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$url&uuid=$uuid'>Show content</a></div></div>";
         }
         catch (\Exception $e) {
           watchdog_exception('url_embed', $e);

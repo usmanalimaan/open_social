@@ -140,7 +140,8 @@ class SocialEmbedConvertUrlToEmbedFilter extends ConvertUrlToEmbedFilter {
                 $info = \Drupal::service('url_embed')->getUrlInfo(Html::decodeEntities($match[1]));
                 if ($info) {
                   // Replace URL with consent button.
-                  return "<div class='social-embed-container' id='social-embed-placeholder' data-social-embed-url=$match[1]><div id='social-embed-iframe'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$match[1]'>Show content</a></div></div>";
+                  $uuid = \Drupal::service('uuid')->generate();
+                  return "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$match[1]&uuid=$uuid'>Show content</a></div></div>";
                 }
                 else {
                   return $match[1];
