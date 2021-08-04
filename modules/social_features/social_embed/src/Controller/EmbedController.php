@@ -5,6 +5,7 @@ namespace Drupal\social_embed\Controller;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Link;
 use Drupal\social_embed\Service\EmbedHelper;
 use Drupal\url_embed\UrlEmbed;
 use Drupal\user\UserDataInterface;
@@ -38,7 +39,7 @@ class EmbedController extends ControllerBase {
    * @param \Drupal\user\UserDataInterface $user_data
    * @param \Drupal\social_embed\Service\EmbedHelper $embed_helper
    */
-  public function __construct(UserDataInterface $user_data, UrlEmbed $url_embed,EmbedHelper $embed_helper) {
+  public function __construct(UserDataInterface $user_data, UrlEmbed $url_embed, EmbedHelper $embed_helper) {
     $this->userData = $user_data;
     $this->urlEmbed = $url_embed;
     $this->embedHelper = $embed_helper;
@@ -85,11 +86,17 @@ class EmbedController extends ControllerBase {
     if ($url == NULL) {
       throw new NotFoundHttpException();
     }
-    $info = \Drupal::service('url_embed')->getUrlInfo($url);
-    $iframe = $info['code'];
     $response = new AjaxResponse();
-    $selector = '#social-embed-container';
-    $content = "<div id='social-embed-iframe'><p>$iframe</p></div>";
+    $selector = '#social-embed-iframe';
+    if ($info = \Drupal::service('url_embed')->getUrlInfo($url)) {
+      $iframe = $info['code'];
+      ;
+      $content = "<div id='social-embed-iframe'><p>$iframe</p></div>";
+    }
+    else {
+      $link = Link::fromTextAndUrl($url, $url)->toString();
+      $content = "<div id='social-embed-iframe'><p>$link</p></div>";
+    }
     $response->addCommand(new ReplaceCommand($selector, $content));
     return $response;
   }

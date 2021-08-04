@@ -4,7 +4,6 @@ namespace Drupal\social_embed\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element\Link;
 use Drupal\filter\FilterProcessResult;
 use Drupal\url_embed\Plugin\Filter\ConvertUrlToEmbedFilter;
 
@@ -21,7 +20,7 @@ use Drupal\url_embed\Plugin\Filter\ConvertUrlToEmbedFilter;
  *   },
  * )
  */
-class SocialEmbedUrlFilter extends ConvertUrlToEmbedFilter {
+class SocialEmbedConvertUrlToEmbedFilter extends ConvertUrlToEmbedFilter {
 
   /**
    * {@inheritdoc}
@@ -140,8 +139,8 @@ class SocialEmbedUrlFilter extends ConvertUrlToEmbedFilter {
               try {
                 $info = \Drupal::service('url_embed')->getUrlInfo(Html::decodeEntities($match[1]));
                 if ($info) {
-                  $image_url = \Drupal::service('social_embed.helper_service')->getEmbedPlaceholderImage();
-                  return "<div class='container' id='social-embed-placeholder' data-social-embed-url=$match[1]><div id='social-embed-container'><a class=\"use-ajax\" href='/api/opensocial/social-embed/generate?url=$match[1]'><img src=\"$image_url\"></a></div></div>";
+                  // Replace URL with consent button.
+                  return "<div class='social-embed-container' id='social-embed-placeholder' data-social-embed-url=$match[1]><div id='social-embed-iframe'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$match[1]'>Show content</a></div></div>";
                 }
                 else {
                   return $match[1];
