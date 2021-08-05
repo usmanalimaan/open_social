@@ -7,7 +7,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Link;
-use Drupal\social_embed\Service\EmbedHelper;
+use Drupal\Core\Url;
 use Drupal\url_embed\UrlEmbed;
 use Drupal\user\UserDataInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -18,13 +18,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * Controller for Social Embed endpoint handling.
  */
 class EmbedController extends ControllerBase {
-
-  /**
-   * The social embed helper services.
-   *
-   * @var \Drupal\social_embed\Service\EmbedHelper
-   */
-  protected EmbedHelper $embedHelper;
 
   /**
    * The user data services.
@@ -47,13 +40,10 @@ class EmbedController extends ControllerBase {
    *   The user data services.
    * @param \Drupal\url_embed\UrlEmbed $url_embed
    *   The url embed services.
-   * @param \Drupal\social_embed\Service\EmbedHelper $embed_helper
-   *   The social embed services.
    */
-  public function __construct(UserDataInterface $user_data, UrlEmbed $url_embed, EmbedHelper $embed_helper) {
+  public function __construct(UserDataInterface $user_data, UrlEmbed $url_embed) {
     $this->userData = $user_data;
     $this->urlEmbed = $url_embed;
-    $this->embedHelper = $embed_helper;
   }
 
   /**
@@ -67,24 +57,24 @@ class EmbedController extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('user.data'),
-      $container->get('url_embed'),
-      $container->get('social_embed.helper_service')
+      $container->get('url_embed')
     );
   }
 
   /**
-   * Returns the consent of current user.
-   */
-  public function checkConsent(string $provider) {
-    /** @var \Drupal\social_user\Entity\User $account */
-    $account = $this->currentUser();
-    $user_states = $this->userData->get('social_embed', $account->id(), 'consent');
-
-    return $user_states[$provider];
-  }
-
-  /**
    * Generates embed content of a give URL.
+   *
+   * When the site-wide setting for consent is enabled, the links in posts and
+   * nodes will be replaced with placeholder divs and a show content button.
+   *
+   * Once user clicks the button, it will send request to this controller along
+   * with url of the content to embed and an uuid which differentiates each
+   * link.
+   *
+   * See:
+   * 1. SocialEmbedConvertUrlToEmbedFilter::convertUrls
+   * 2. SocialEmbedUrlEmbedFilter::process
+   * 3. EmbedConsentForm::buildForm
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request object.
@@ -93,31 +83,34 @@ class EmbedController extends ControllerBase {
    *   The Ajax response.
    */
   public function generateEmbed(Request $request) {
+    // Get the requested URL of content to embed.
     $url = $request->query->get('url');
+    // Get unique identifier for the button which was clicked.
     $uuid = $request->query->get('uuid');
+
+    // If $url or $uuid is not present, then request is malformed.
     if ($url == NULL && Uuid::isValid($uuid) != FALSE) {
       throw new NotFoundHttpException();
     }
+
+    // Let's prepare the response.
     $response = new AjaxResponse();
+
+    // Use uuid to set the selector to the specific div we need to replace.
     $selector = "#social-embed-iframe-$uuid";
-    if ($info = \Drupal::service('url_embed')->getUrlInfo($url)) {
+    // If the content is embeddable then return the iFrame.
+    if ($info = $this->urlEmbed->getUrlInfo($url)) {
       $iframe = $info['code'];
-      ;
       $content = "<div id='social-embed-iframe-$uuid'><p>$iframe</p></div>";
     }
     else {
-      $link = Link::fromTextAndUrl($url, $url)->toString();
-      $content = "<div id='social-embed-iframe-$uuid'><p>$link</p></div>";
+      // Else return the link itself.
+      $content = Link::fromTextAndUrl($url, Url::fromUri($url))->toString();
     }
+
+    // And return the response which will replace the button
+    // with embeddable content.
     $response->addCommand(new ReplaceCommand($selector, $content));
     return $response;
   }
-
-  /**
-   * Returns the placeholder file url.
-   */
-  public function getPlaceholderImage(): string {
-    return $this->embedHelper->getEmbedPlaceholderImage();
-  }
-
 }
