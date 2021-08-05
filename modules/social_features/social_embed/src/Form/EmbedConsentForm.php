@@ -2,11 +2,9 @@
 
 namespace Drupal\social_embed\Form;
 
-use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The form for different setting about embed consent.
@@ -19,36 +17,6 @@ class EmbedConsentForm extends ConfigFormBase {
    * @var string
    */
   const SETTINGS = 'social_embed.settings';
-
-  /**
-   * The cache services.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected CacheBackendInterface $cacheRender;
-
-  /**
-   * Constructs a \Drupal\system\ConfigFormBase object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheRender
-   *   The cache services.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, CacheBackendInterface $cacheRender) {
-    parent::__construct($config_factory);
-    $this->cacheRender = $cacheRender;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('cache.render'),
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -102,7 +70,10 @@ class EmbedConsentForm extends ConfigFormBase {
     // Retrieve the configuration.
     $config = $this->configFactory->getEditable(static::SETTINGS);
     if ($config->get('settings') != ($new_value = $form_state->getValue('settings'))) {
-      $this->cacheRender->invalidateAll();
+      Cache::invalidateTags([
+        'config:filter.format.basic_html',
+        'config:filter.format.full_html',
+      ]);
       // Set the submitted configuration setting.
       $config->set('settings', $new_value)
         ->save();
