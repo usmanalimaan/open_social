@@ -1,11 +1,3 @@
-social_embed.consent:
-  path: '/api/opensocial/social-embed/consent'
-  defaults:
-    _controller: '\Drupal\social_embed\Controller\EmbedController::checkConsent'
-    _title: 'Embed consent'
-  requirements:
-    _access: 'TRUE'
-
 social_embed.generate:
   path: '/api/opensocial/social-embed/generate'
   defaults:
