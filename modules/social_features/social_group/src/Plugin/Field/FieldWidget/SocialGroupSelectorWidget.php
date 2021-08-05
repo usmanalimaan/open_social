@@ -263,15 +263,7 @@ class SocialGroupSelectorWidget extends Select2EntityReferenceWidget implements 
       $selected_visibility = $selected_visibility['0']['value'];
     }
     if ($selected_groups = $form_state->getValue('groups')) {
-      foreach ($selected_groups as $selected_group_key => $selected_group) {
-        $gid = $selected_group['target_id'];
-        $group = Group::load($gid);
-        $group_type_id = $group->getGroupType()->id();
-
-        $allowed_visibility_options = social_group_get_allowed_visibility_options_per_group_type($group_type_id, NULL, $entity, $group);
-        // @todo Add support for multiple groups, for now just process 1 group.
-        break;
-      }
+      $allowed_visibility_options = self::getVisibilityOptionsforMultipleGroups(array_column($selected_groups, 'target_id'));
     }
     else {
       $default_visibility = $form_state->getValue('default_visibility');
@@ -306,6 +298,52 @@ class SocialGroupSelectorWidget extends Select2EntityReferenceWidget implements 
     );
 
     return $ajax_response;
+  }
+
+  /**
+   * Get content visibility options for multiple groups.
+   *
+   *  If there are a few groups user should be able to add visibility options
+   *  only if the groups have at least one shared option.
+   *  F.e, if "Open Group" have only "Public" option and "Secret Group" have
+   *  "Only group members" option then user should not be able to save
+   *  the entity (because of error).
+   *
+   * @param array $gids
+   *   A list of groups ids.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The content entity.
+   *
+   * @return array
+   *   A list of visibility options.
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  private static function getVisibilityOptionsforMultipleGroups(array $gids, $entity) {
+    $groups = \Drupal::entityTypeManager()
+      ->getStorage('group')
+      ->loadMultiple($gids);
+    foreach ($groups as $group) {
+      $group_type_id = $group->getGroupType()->id();
+      $options[] = social_group_get_allowed_visibility_options_per_group_type($group_type_id, NULL, $entity, $group);;
+    }
+
+    if (isset($options)) {
+      $allowed_visibility_options = [];
+      foreach ($options as $item) {
+        foreach ($item as $key => $value) {
+          if (!isset($allowed_visibility_options[$key])) {
+            $allowed_visibility_options[$key] = $value;
+          }
+          // We always rewrite options if it is "FALSE".
+          if (!$value) {
+            $allowed_visibility_options[$key] = $value;
+          }
+        }
+      }
+    }
+
+    return $allowed_visibility_options ?? [];
   }
 
   /**
