@@ -7,6 +7,9 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\file\Entity\File;
 
+/**
+ * Helper functions for Social Embed module.
+ */
 class EmbedHelper {
 
   /**
@@ -28,6 +31,8 @@ class EmbedHelper {
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   Module handler.
+   * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
+   *   The entity manager object.
    */
   public function __construct(ModuleHandlerInterface $module_handler, EntityTypeManager $entity_type_manager) {
     $this->moduleHandler = $module_handler;
@@ -39,6 +44,10 @@ class EmbedHelper {
    *
    * @return string
    *   File path.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function getEmbedPlaceholderImage(): string {
     /** @var \Drupal\file\FileInterface[] $files */
@@ -47,7 +56,8 @@ class EmbedHelper {
     $file = reset($files) ?: NULL;
     if ($file) {
       return $file->createFileUrl();
-    } else {
+    }
+    else {
       $module_path = $this->moduleHandler->getModule('social_embed')->getPath();
       $file_path = $module_path . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'video_placeholder_img1.jpeg';
       $file_system = \Drupal::service('file_system');
@@ -63,4 +73,5 @@ class EmbedHelper {
       return $media->createFileUrl();
     }
   }
+
 }

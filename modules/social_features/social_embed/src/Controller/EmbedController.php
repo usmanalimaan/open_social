@@ -20,25 +20,35 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class EmbedController extends ControllerBase {
 
   /**
+   * The social embed helper services.
+   *
    * @var \Drupal\social_embed\Service\EmbedHelper
    */
   protected EmbedHelper $embedHelper;
 
   /**
+   * The user data services.
+   *
    * @var \Drupal\user\UserDataInterface
    */
   protected UserDataInterface $userData;
 
   /**
+   * Url Embed services.
+   *
    * @var \Drupal\url_embed\UrlEmbed
    */
   protected UrlEmbed $urlEmbed;
 
   /**
-   * The ModalFormExampleController constructor.
+   * The EmbedController constructor.
    *
    * @param \Drupal\user\UserDataInterface $user_data
+   *   The user data services.
+   * @param \Drupal\url_embed\UrlEmbed $url_embed
+   *   The url embed services.
    * @param \Drupal\social_embed\Service\EmbedHelper $embed_helper
+   *   The social embed services.
    */
   public function __construct(UserDataInterface $user_data, UrlEmbed $url_embed, EmbedHelper $embed_helper) {
     $this->userData = $user_data;
@@ -63,7 +73,7 @@ class EmbedController extends ControllerBase {
   }
 
   /**
-   *
+   * Returns the consent of current user.
    */
   public function checkConsent(string $provider) {
     /** @var \Drupal\social_user\Entity\User $account */
@@ -93,7 +103,7 @@ class EmbedController extends ControllerBase {
     if ($info = \Drupal::service('url_embed')->getUrlInfo($url)) {
       $iframe = $info['code'];
       ;
-      $content = "<div id='social-embed-iframe'><p>$iframe</p></div>";
+      $content = "<div id='social-embed-iframe-$uuid'><p>$iframe</p></div>";
     }
     else {
       $link = Link::fromTextAndUrl($url, $url)->toString();

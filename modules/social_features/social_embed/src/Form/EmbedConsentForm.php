@@ -2,11 +2,14 @@
 
 namespace Drupal\social_embed\Form;
 
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- *
+ * The form for different setting about embed consent.
  */
 class EmbedConsentForm extends ConfigFormBase {
 
@@ -18,10 +21,40 @@ class EmbedConsentForm extends ConfigFormBase {
   const SETTINGS = 'social_embed.settings';
 
   /**
+   * The cache services.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected CacheBackendInterface $cacheRender;
+
+  /**
+   * Constructs a \Drupal\system\ConfigFormBase object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheRender
+   *   The cache services.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, CacheBackendInterface $cacheRender) {
+    parent::__construct($config_factory);
+    $this->cacheRender = $cacheRender;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('cache.render'),
+    );
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'example_admin_settings';
+    return 'social_embed_admin_settings';
   }
 
   /**
@@ -39,16 +72,42 @@ class EmbedConsentForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config(static::SETTINGS);
 
-    $form['example_thing'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Things'),
-      '#default_value' => $config->get('example_thing'),
+    // Add an introduction text to explain what can be done here.
+    // Add warning message.
+    $form['warning_message'] = [
+      '#theme' => 'status_messages',
+      '#message_list' => [
+        'warning' => [
+          [
+            '#type' => 'html_tag',
+            '#tag' => 'strong',
+            '#value' => t("If the settings are changed, then once you submit this form, site's cache will be reset."),
+          ],
+        ],
+      ],
+      '#status_headings' => [
+        'warning' => t('Attention!'),
+      ],
+      '#weight' => -1,
     ];
 
-    $form['other_things'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Other things'),
-      '#default_value' => $config->get('other_things'),
+    $form['description'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => $this->t('The following setting will allow the users to be able to provide consent before showing the embedded content. The users will also be able to customize options to allow/disallow embed providers in the user settings.'),
+    ];
+
+    $form['consent'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Site wide consent'),
+      '#open' => TRUE,
+    ];
+
+    $form['consent']['settings'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Allow consent'),
+      '#default_value' => $config->get('settings'),
+      '#description' => $this->t('When disabled, all the embedded content will be shown by default.'),
     ];
 
     return parent::buildForm($form, $form_state);
@@ -59,13 +118,13 @@ class EmbedConsentForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Retrieve the configuration.
-    $this->configFactory->getEditable(static::SETTINGS)
+    $config = $this->configFactory->getEditable(static::SETTINGS);
+    if ($config->get('settings') != ($new_value = $form_state->getValue('settings'))) {
+      $this->cacheRender->invalidateAll();
       // Set the submitted configuration setting.
-      ->set('example_thing', $form_state->getValue('example_thing'))
-      // You can set multiple configurations at once by making
-      // multiple calls to set().
-      ->set('other_things', $form_state->getValue('other_things'))
-      ->save();
+      $config->set('settings', $new_value)
+        ->save();
+    }
 
     parent::submitForm($form, $form_state);
   }

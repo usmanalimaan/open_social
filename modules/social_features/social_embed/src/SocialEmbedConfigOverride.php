@@ -9,7 +9,7 @@ use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
- * Class SocialEmbedConfigOverride.
+ * Configuration overrides for Social Embed module.
  *
  * @package Drupal\social_embed
  */

@@ -14,7 +14,7 @@ use Drupal\file\Entity\File;
 /**
  * Function that creates an embed button with a custom icon.
  */
-function social_embed_create_media_button() {
+function _social_embed_create_media_button() {
 
   // Create a File entity for the icon.
   $path = drupal_get_path('module', 'social_embed');
@@ -41,6 +41,13 @@ function social_embed_create_media_button() {
   ]);
   $button->save();
 
+}
+
+/**
+ * Helper function for granting permissions.
+ */
+function _social_embed_create_permissions() {
+  user_role_grant_permissions('sitemanager', ['administer social embed settings']);
 }
 
 /**
@@ -143,5 +150,5 @@ function _social_embed_form_user_form_submit($form, FormStateInterface $form_sta
  */
 function social_embed_page_attachments_alter(array &$attachments) {
   // Unconditionally attach an asset to the page.
- $attachments['#attached']['library'][] = 'core/drupal.ajax';
+  $attachments['#attached']['library'][] = 'core/drupal.ajax';
 }
