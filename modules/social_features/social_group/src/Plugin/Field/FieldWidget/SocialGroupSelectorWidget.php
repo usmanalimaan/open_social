@@ -263,7 +263,7 @@ class SocialGroupSelectorWidget extends Select2EntityReferenceWidget implements 
       $selected_visibility = $selected_visibility['0']['value'];
     }
     if ($selected_groups = $form_state->getValue('groups')) {
-      $allowed_visibility_options = self::getVisibilityOptionsforMultipleGroups(array_column($selected_groups, 'target_id'));
+      $allowed_visibility_options = self::getVisibilityOptionsforMultipleGroups(array_column($selected_groups, 'target_id'), $entity);
     }
     else {
       $default_visibility = $form_state->getValue('default_visibility');
