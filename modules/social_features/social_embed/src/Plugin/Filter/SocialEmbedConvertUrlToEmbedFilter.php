@@ -116,7 +116,7 @@ class SocialEmbedConvertUrlToEmbedFilter extends ConvertUrlToEmbedFilter {
       // HTML comments need to be handled separately, as they may contain HTML
       // markup, especially a '>'. Therefore, remove all comment contents
       // and add them back later.
-      _filter_url_escape_comments('', TRUE);
+      _filter_url_escape_comments([], TRUE);
       $text = preg_replace_callback('`<!--(.*?)-->`s', '_filter_url_escape_comments', $text);
 
       // Split at all tags; ensures that no tags or attributes are processed.
@@ -184,7 +184,7 @@ class SocialEmbedConvertUrlToEmbedFilter extends ConvertUrlToEmbedFilter {
 
       $text = implode($chunks);
       // Revert to the original comment contents.
-      _filter_url_escape_comments('', FALSE);
+      _filter_url_escape_comments([], FALSE);
       return preg_replace_callback('`<!--(.*?)-->`', '_filter_url_escape_comments', $text);
     }
     return parent::convertUrls($text, $url_prefix);

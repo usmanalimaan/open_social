@@ -73,24 +73,6 @@ class EmbedConsentForm extends ConfigFormBase {
     $config = $this->config(static::SETTINGS);
 
     // Add an introduction text to explain what can be done here.
-    // Add warning message.
-    $form['warning_message'] = [
-      '#theme' => 'status_messages',
-      '#message_list' => [
-        'warning' => [
-          [
-            '#type' => 'html_tag',
-            '#tag' => 'strong',
-            '#value' => t("If the settings are changed, then once you submit this form, site's cache will be reset."),
-          ],
-        ],
-      ],
-      '#status_headings' => [
-        'warning' => t('Attention!'),
-      ],
-      '#weight' => -1,
-    ];
-
     $form['description'] = [
       '#type' => 'html_tag',
       '#tag' => 'p',
