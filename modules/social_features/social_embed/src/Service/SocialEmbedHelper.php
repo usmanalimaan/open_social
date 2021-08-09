@@ -27,7 +27,7 @@ class SocialEmbedHelper {
     // Add our custom tag so that we invalidate them when site manager
     // changes consent settings.
     // @see EmbedConsentForm
-    $result->addCacheTags(['social_embed:filter.convert_url']);
+    $result->addCacheTags([$tag]);
     // We need this library to be attached as we are using 'use-ajax'
     // class in the show consent button markup.
     $result->addAttachments([

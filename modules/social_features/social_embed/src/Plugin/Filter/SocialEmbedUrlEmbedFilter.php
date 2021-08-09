@@ -88,7 +88,8 @@ class SocialEmbedUrlEmbedFilter extends UrlEmbedFilter {
       $plugin_definition,
       $container->get('url_embed'),
       $container->get('uuid'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('social_embed.helper_service')
     );
   }
 
@@ -134,7 +135,6 @@ class SocialEmbedUrlEmbedFilter extends UrlEmbedFilter {
     }
     // Add the required dependencies and cache tags.
     return $this->embedHelper->addDependencies($result, 'social_embed:filter.url_embed');
-    ;
   }
 
 }
