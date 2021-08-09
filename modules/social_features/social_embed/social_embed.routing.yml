@@ -4,7 +4,7 @@ social_embed.generate:
     _controller: '\Drupal\social_embed\Controller\EmbedController::generateEmbed'
     _title: 'Generate embed'
   requirements:
-    _access: 'TRUE'
+    _permission: 'generate social embed content'
 
 social_embed.settings:
   path: 'admin/config/opensocial/embed-consent'

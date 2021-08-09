@@ -47,4 +47,5 @@ function _social_embed_create_media_button() {
  */
 function _social_embed_create_permissions() {
   user_role_grant_permissions('sitemanager', ['administer social embed settings']);
+  user_role_grant_permissions('authenticated', ['generate social embed content']);
 }
