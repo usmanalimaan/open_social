@@ -7,6 +7,7 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Component\Uuid\Php;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\filter\FilterProcessResult;
+use Drupal\social_embed\Service\SocialEmbedHelper;
 use Drupal\url_embed\Plugin\Filter\UrlEmbedFilter;
 use Drupal\url_embed\UrlEmbedInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -38,7 +39,14 @@ class SocialEmbedUrlEmbedFilter extends UrlEmbedFilter {
   protected ConfigFactory $configFactory;
 
   /**
-   * Constructs a UrlEmbedFilter object.
+   * The social embed helper services.
+   *
+   * @var \Drupal\social_embed\Service\SocialEmbedHelper
+   */
+  protected SocialEmbedHelper $embedHelper;
+
+  /**
+   * Constructs a SocialEmbedUrlEmbedFilter object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -52,11 +60,22 @@ class SocialEmbedUrlEmbedFilter extends UrlEmbedFilter {
    *   The uuid services.
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The config factory services.
+   * @param \Drupal\social_embed\Service\SocialEmbedHelper $embed_helper
+   *   The social embed helper class object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, UrlEmbedInterface $url_embed, Php $uuid, ConfigFactory $config_factory) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    UrlEmbedInterface $url_embed,
+    Php $uuid,
+    ConfigFactory $config_factory,
+    SocialEmbedHelper $embed_helper
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $url_embed);
     $this->uuid = $uuid;
     $this->configFactory = $config_factory;
+    $this->embedHelper = $embed_helper;
   }
 
   /**
@@ -77,42 +96,45 @@ class SocialEmbedUrlEmbedFilter extends UrlEmbedFilter {
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
-    if ($this->configFactory->get('social_embed.settings')->get('settings')) {
-      $result = new FilterProcessResult($text);
-      if (strpos($text, 'data-embed-url') !== FALSE) {
-        $dom = Html::load($text);
-        $xpath = new \DOMXPath($dom);
-
-        foreach ($xpath->query('//drupal-url[@data-embed-url]') as $node) {
-          /** @var \DOMElement $node */
-          $url = $node->getAttribute('data-embed-url');
-          $url_output = '';
-          try {
+    $result = new FilterProcessResult($text);
+    if (strpos($text, 'data-embed-url') !== FALSE) {
+      $dom = Html::load($text);
+      $xpath = new \DOMXPath($dom);
+      foreach ($xpath->query('//drupal-url[@data-embed-url]') as $node) {
+        /** @var \DOMElement $node */
+        $url = $node->getAttribute('data-embed-url');
+        $url_output = '';
+        try {
+          if ($this->configFactory->get('social_embed.settings')->get('settings')) {
             // Replace URL with consent button.
             $uuid = $this->uuid->generate();
             $url_output = "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$url&uuid=$uuid'>Show content</a></div></div>";
           }
-          catch (\Exception $e) {
-            watchdog_exception('url_embed', $e);
-          } finally {
-            // If the $url_output is empty, that means URL is non-embeddable.
-            // So, we return the original url instead of blank output.
-            if ($url_output == NULL || $url_output == '') {
-              // The reason of using _filter_url() function here is to make
-              // sure that the maximum URL cases e.g., emails are covered.
-              $url_output = UrlHelper::isValid($url) ? _filter_url($url, $this) : $url;
-            }
+          else {
+            $info = $this->urlEmbed->getUrlInfo($url);
+            $url_output = $info['code'];
           }
-
-          $this->replaceNodeContent($node, $url_output);
+        }
+        catch (\Exception $e) {
+          watchdog_exception('url_embed', $e);
+        } finally {
+          // If the $url_output is empty, that means URL is non-embeddable.
+          // So, we return the original url instead of blank output.
+          if ($url_output == NULL || $url_output == '') {
+            // The reason of using _filter_url() function here is to make
+            // sure that the maximum URL cases e.g., emails are covered.
+            $url_output = UrlHelper::isValid($url) ? _filter_url($url, $this) : $url;
+          }
         }
 
-        $result->setProcessedText(Html::serialize($dom));
+        $this->replaceNodeContent($node, $url_output);
       }
-      return $result;
-    }
 
-    return parent::process($text, $langcode);
+      $result->setProcessedText(Html::serialize($dom));
+    }
+    // Add the required dependencies and cache tags.
+    return $this->embedHelper->addDependencies($result, 'social_embed:filter.url_embed');
+    ;
   }
 
 }

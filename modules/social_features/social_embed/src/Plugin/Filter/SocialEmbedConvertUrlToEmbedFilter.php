@@ -4,8 +4,11 @@ namespace Drupal\social_embed\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\filter\FilterProcessResult;
+use Drupal\social_embed\Service\SocialEmbedHelper;
 use Drupal\url_embed\Plugin\Filter\ConvertUrlToEmbedFilter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a filter to display embedded entities based on data attributes.
@@ -20,7 +23,43 @@ use Drupal\url_embed\Plugin\Filter\ConvertUrlToEmbedFilter;
  *   },
  * )
  */
-class SocialEmbedConvertUrlToEmbedFilter extends ConvertUrlToEmbedFilter {
+class SocialEmbedConvertUrlToEmbedFilter extends ConvertUrlToEmbedFilter implements ContainerFactoryPluginInterface {
+
+  /**
+   * The social embed helper services.
+   *
+   * @var \Drupal\social_embed\Service\SocialEmbedHelper
+   */
+  protected SocialEmbedHelper $embedHelper;
+
+  /**
+   * Constructs a SocialEmbedConvertUrlToEmbedFilter object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\social_embed\Service\SocialEmbedHelper $embed_helper
+   *   The social embed helper class object.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, SocialEmbedHelper $embed_helper) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->embedHelper = $embed_helper;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('social_embed.helper_service')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -34,11 +73,15 @@ class SocialEmbedConvertUrlToEmbedFilter extends ConvertUrlToEmbedFilter {
    */
   public function process($text, $langcode) {
     // Check for whitelisted URL.
-    if ($this->whiteList($text)) {
-      return new FilterProcessResult(static::convertUrls($text, $this->settings['url_prefix']));
+    if ($this->embedHelper->whiteList($text)) {
+      $result = new FilterProcessResult(static::convertUrls($text, $this->settings['url_prefix']));
+    }
+    else {
+      $result = new FilterProcessResult($text);
     }
     // Not whitelisted is return the string as is.
-    return new FilterProcessResult($text);
+    // Also, add the required dependencies and cache tags.
+    return $this->embedHelper->addDependencies($result, 'social_embed:filter.convert_url');
   }
 
   /**
@@ -142,9 +185,14 @@ class SocialEmbedConvertUrlToEmbedFilter extends ConvertUrlToEmbedFilter {
                 try {
                   $info = \Drupal::service('url_embed')->getUrlInfo(Html::decodeEntities($match[1]));
                   if ($info) {
-                    // Replace URL with consent button.
-                    $uuid = \Drupal::service('uuid')->generate();
-                    return "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$match[1]&uuid=$uuid'>Show content</a></div></div>";
+                    if (\Drupal::config('social_embed.settings')->get('settings')) {
+                      // Replace URL with consent button.
+                      $uuid = \Drupal::service('uuid')->generate();
+                      return "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$match[1]&uuid=$uuid'>Show content</a></div></div>";
+                    }
+                    else {
+                      return '<drupal-url data-embed-url="' . $match[1] . '"></drupal-url>';
+                    }
                   }
                   else {
                     return $match[1];
@@ -188,54 +236,6 @@ class SocialEmbedConvertUrlToEmbedFilter extends ConvertUrlToEmbedFilter {
       return preg_replace_callback('`<!--(.*?)-->`', '_filter_url_escape_comments', $text);
     }
     return parent::convertUrls($text, $url_prefix);
-  }
-
-  /**
-   * Checks if item is on the whitelist.
-   *
-   * @param string $text
-   *   The item to check for.
-   *
-   * @return bool
-   *   Return if the item is on the whitelist or not.
-   */
-  public function whiteList($text) {
-    // Fetch allowed patterns.
-    $patterns = $this->getPatterns();
-
-    // Check if the URL provided is from a whitelisted site.
-    foreach ($patterns as $pattern) {
-      // Testing pattern.
-      $testing_pattern = '/' . $pattern . '/';
-      // Check if it matches.
-      if (preg_match($testing_pattern, $text)) {
-        return TRUE;
-      }
-    }
-    return FALSE;
-  }
-
-  /**
-   * A list of whitelisted patterns.
-   *
-   * @return array
-   *   The list of patterns.
-   */
-  private function getPatterns() {
-    return [
-      'facebook.com\/(.*)\/videos\/(.*)',
-      'facebook.com\/(.*)\/photos\/(.*)',
-      'facebook.com\/(.*)\/posts\/(.*)',
-      'flickr.com\/photos\/(.*)',
-      'flic.kr\/p\/(.*)',
-      'instagram.com\/p\/(.*)',
-      'open.spotify.com\/track\/(.*)',
-      'twitter.com\/(.*)\/status\/(.*)',
-      'vimeo.com\/\d{7,9}',
-      'youtube.com\/watch[?]v=(.*)',
-      'youtu.be\/(.*)',
-      'ted.com\/talks\/(.*)',
-    ];
   }
 
 }

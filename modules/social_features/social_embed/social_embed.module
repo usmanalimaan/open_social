@@ -48,11 +48,3 @@ function _social_embed_create_media_button() {
 function _social_embed_create_permissions() {
   user_role_grant_permissions('sitemanager', ['administer social embed settings']);
 }
-
-/**
- * Implements hook_page_attachments_alter().
- */
-function social_embed_page_attachments_alter(array &$attachments) {
-  // Unconditionally attach an asset to the page.
-  $attachments['#attached']['library'][] = 'core/drupal.ajax';
-}

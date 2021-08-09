@@ -70,9 +70,13 @@ class EmbedConsentForm extends ConfigFormBase {
     // Retrieve the configuration.
     $config = $this->configFactory->getEditable(static::SETTINGS);
     if ($config->get('settings') != ($new_value = $form_state->getValue('settings'))) {
+      // Let's invalidate our custom tags so that render cache of such content
+      // can be rebuilt and the effect of changed settings can take place.
+      // @see: SocialEmbedConvertUrlToEmbedFilter
+      // @see: SocialEmbedUrlEmbedFilter
       Cache::invalidateTags([
-        'config:filter.format.basic_html',
-        'config:filter.format.full_html',
+        'social_embed:filter.convert_url',
+        'social_embed:filter.url_embed',
       ]);
       // Set the submitted configuration setting.
       $config->set('settings', $new_value)
