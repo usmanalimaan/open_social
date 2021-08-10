@@ -326,9 +326,9 @@ class SocialGroupSelectorWidget extends Select2EntityReferenceWidget implements 
       ->loadMultiple($gids);
 
     foreach ($groups as $group) {
-      /* @var \Drupal\group\Entity\Group $group */
+      /* @var \Drupal\group\Entity\GroupInterface $group */
       $group_type_id = $group->getGroupType()->id();
-      $options[] = social_group_get_allowed_visibility_options_per_group_type($group_type_id, NULL, $entity, $group);;
+      $options[] = social_group_get_allowed_visibility_options_per_group_type($group_type_id, NULL, $entity, $group);
     }
 
     if (isset($options)) {
