@@ -316,14 +316,17 @@ class SocialGroupSelectorWidget extends Select2EntityReferenceWidget implements 
    *
    * @return array
    *   A list of visibility options.
+   *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  private static function getVisibilityOptionsforMultipleGroups(array $gids, $entity) {
+  private static function getVisibilityOptionsforMultipleGroups(array $gids, EntityInterface $entity) {
     $groups = \Drupal::entityTypeManager()
       ->getStorage('group')
       ->loadMultiple($gids);
+
     foreach ($groups as $group) {
+      /* @var \Drupal\group\Entity\Group $group */
       $group_type_id = $group->getGroupType()->id();
       $options[] = social_group_get_allowed_visibility_options_per_group_type($group_type_id, NULL, $entity, $group);;
     }
