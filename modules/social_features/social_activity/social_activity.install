@@ -263,14 +263,50 @@ function social_activity_update_8807() {
 }
 
 /**
- * Add a new filter to "notifications" view.
+ * Resolve missing filter on Activity Stream view.
  */
 function social_activity_update_10301() {
+  // Set the key for the filter to remove from all displays.
+  $filter_to_remove = 'activity_filter_nodes_from_my_groups_filter';
+
+  $config_factory = \Drupal::configFactory();
+  // Load the activity stream.
+  $view = $config_factory->getEditable('views.view.activity_stream');
+  // Get the displays.
+  $displays = $view->get('display');
+
+  // Remove the filter from any displays where it is used.
+  $updated = [];
+  if (is_array($displays)) {
+    foreach ($displays as $display_name => &$display) {
+      // Remove the redundant filter.
+      if (isset($display['display_options']['filters'][$filter_to_remove])) {
+        unset($display['display_options']['filters'][$filter_to_remove]);
+        $updated[] = $display_name;
+      }
+    }
+  }
+
+  // Save and log if we changed a display.
+  if (count($updated)) {
+    $view->set('display', $displays);
+    $view->save(TRUE);
+    // Log the updates.
+    foreach ($updated as $display_name) {
+      \Drupal::logger('system')->info('Filter removed from display: %name', ['%name' => $display_name]);
+    }
+  }
+}
+
+/**
+ * Add a new filter to "notifications" view.
+ */
+function social_activity_update_10302() {
   /** @var \Drupal\update_helper\Updater $updateHelper */
   $updateHelper = \Drupal::service('update_helper.updater');
 
   // Execute configuration update definitions with logging of success.
-  $updateHelper->executeUpdate('social_activity', 'social_activity_update_10301');
+  $updateHelper->executeUpdate('social_activity', 'social_activity_update_10302');
 
   // Output logged messages to related channel of update execution.
   return $updateHelper->logger()->output();
@@ -279,7 +315,7 @@ function social_activity_update_10301() {
 /**
  * Add changes to message templates.
  */
-function social_activity_update_8902() {
+function social_activity_update_10303() {
   $config_path = drupal_get_path('module', 'social_activity') . '/config/install';
   $source = new FileStorage($config_path);
   $config_storage = \Drupal::service('config.storage');
