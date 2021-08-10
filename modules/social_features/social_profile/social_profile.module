@@ -52,6 +52,26 @@ function social_profile_field_widget_form_alter(&$element, FormStateInterface $f
       // @todo Remove this when script for custom selects will be added.
       $element['country_code']['#attributes']['class'][] = 'browser-default';
       break;
+
+    case 'field_profile_nick_name':
+        $element['value']['#attributes']['autocomplete'][] = 'nickname';
+      break;
+
+    case 'field_profile_first_name':
+      $element['value']['#attributes']['autocomplete'][] = 'given-name';
+      break;
+
+    case 'field_profile_last_name':
+      $element['value']['#attributes']['autocomplete'][] = 'family-name';
+      break;
+
+    case 'field_profile_organization':
+      $element['value']['#attributes']['autocomplete'][] = 'organization';
+      break;
+
+    case 'field_profile_function':
+      $element['value']['#attributes']['autocomplete'][] = 'organization-title';
+      break;
   }
   // This replaces all user entity references with our EntityReferenceSelection.
   if ($field_definition->getType() === 'entity_reference') {
