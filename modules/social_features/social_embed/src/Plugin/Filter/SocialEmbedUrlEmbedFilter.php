@@ -105,14 +105,15 @@ class SocialEmbedUrlEmbedFilter extends UrlEmbedFilter {
         /** @var \DOMElement $node */
         $url = $node->getAttribute('data-embed-url');
         $url_output = '';
+        $info = $this->urlEmbed->getUrlInfo($url);
         try {
           if ($this->configFactory->get('social_embed.settings')->get('settings')) {
             // Replace URL with consent button.
             $uuid = $this->uuid->generate();
-            $url_output = "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$url&uuid=$uuid'>Show content</a></div></div>";
+            $provider = strtolower($info['providerName']);
+            $url_output = "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid' class='social-embed-iframe-$provider'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$url&uuid=$uuid'>Show content</a></div></div>";
           }
           else {
-            $info = $this->urlEmbed->getUrlInfo($url);
             $url_output = $info['code'];
           }
         }

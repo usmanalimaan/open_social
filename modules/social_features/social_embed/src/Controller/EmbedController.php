@@ -101,7 +101,8 @@ class EmbedController extends ControllerBase {
     // If the content is embeddable then return the iFrame.
     if ($info = $this->urlEmbed->getUrlInfo($url)) {
       $iframe = $info['code'];
-      $content = "<div id='social-embed-iframe-$uuid'><p>$iframe</p></div>";
+      $provider = strtolower($info['providerName']);
+      $content = "<div id='social-embed-iframe-$uuid' class='social-embed-iframe-$provider'><p>$iframe</p></div>";
     }
     else {
       // Else return the link itself.
