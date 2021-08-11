@@ -12,6 +12,7 @@ Feature: Embed
     And I press the "Save configuration" button
     Then I should see the text "The configuration options have been saved."
     And I logout
+    Then the cache has been cleared
 
     # Create a topic with embedded content.
     Given I am logged in as an "authenticated user"
@@ -40,10 +41,9 @@ Feature: Embed
     And I press the "Save configuration" button
     Then I should see the text "The configuration options have been saved."
     And I logout
-    Then the cache has been cleared
 
     # Check the content as LU again
-
+    Then the cache has been cleared
     Given I am logged in as an "authenticated user"
     And I am on the homepage
     And I click "Embed consent"
