@@ -27,11 +27,10 @@ Feature: Embed
     And I wait for "3" seconds
     And I press "Create topic"
     Then I should see "Topic Embed consent has been created."
-    And The iframe in the body description should have the src "Show content"
     And I click "Show content"
     And I wait for AJAX to finish
     And I wait for "3" seconds
-    And The iframe in the body description should have the src "https://www.youtube.com/embed/kgE9QNX8f3c"
+    And The embedded content in the body description should have the src "https://www.youtube.com/embed/kgE9QNX8f3c"
     And I logout
 
     # Restore the settings
@@ -41,8 +40,10 @@ Feature: Embed
     And I press the "Save configuration" button
     Then I should see the text "The configuration options have been saved."
     And I logout
+    Then the cache has been cleared
 
-    # Check the content as LU
+    # Check the content as LU again
+
     Given I am logged in as an "authenticated user"
     And I am on the homepage
     And I click "Embed consent"
