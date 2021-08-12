@@ -1,0 +1,14 @@
+.social-embedded-btn {
+  display: flex;
+  flex: 0 0 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  background-color: #e6e6e6;
+  border-radius: 6px;
+  margin: 20px 0;
+  clear: both;
+  min-height: 100px;
+}
+
+/*# sourceMappingURL=consent-placeholder.css.map */

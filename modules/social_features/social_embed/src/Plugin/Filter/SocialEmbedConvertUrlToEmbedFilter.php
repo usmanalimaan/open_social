@@ -189,7 +189,7 @@ class SocialEmbedConvertUrlToEmbedFilter extends ConvertUrlToEmbedFilter impleme
                       // Replace URL with consent button.
                       $uuid = \Drupal::service('uuid')->generate();
                       $provider = strtolower($info['providerName']);
-                      return "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid' class='social-embed-iframe-$provider'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$match[1]&uuid=$uuid'>Show content</a></div></div>";
+                      return "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid' class='social-embedded-btn social-embed-iframe-$provider'><a class='use-ajax btn btn-primary waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$match[1]&uuid=$uuid'>Show content</a></div></div>";
                     }
                     else {
                       return '<drupal-url data-embed-url="' . $match[1] . '"></drupal-url>';

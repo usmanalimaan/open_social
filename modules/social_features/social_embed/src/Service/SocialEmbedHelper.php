@@ -31,7 +31,10 @@ class SocialEmbedHelper {
     // We need this library to be attached as we are using 'use-ajax'
     // class in the show consent button markup.
     $result->addAttachments([
-      'library' => 'core/drupal.ajax',
+      'library' => [
+        'core/drupal.ajax',
+        'social_embed/consent-placeholder',
+      ],
     ]);
 
     return $result;

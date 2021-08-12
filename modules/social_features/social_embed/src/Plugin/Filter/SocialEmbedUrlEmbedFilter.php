@@ -111,7 +111,7 @@ class SocialEmbedUrlEmbedFilter extends UrlEmbedFilter {
             // Replace URL with consent button.
             $uuid = $this->uuid->generate();
             $provider = strtolower($info['providerName']);
-            $url_output = "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid' class='social-embed-iframe-$provider'><a class='use-ajax btn btn-flat waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$url&uuid=$uuid'>Show content</a></div></div>";
+            $url_output = "<div class='social-embed-container' id='social-embed-placeholder'><div id='social-embed-iframe-$uuid' class='social-embedded-btn social-embed-iframe-$provider'><a class='use-ajax btn btn-primary waves-effect waves-btn' href='/api/opensocial/social-embed/generate?url=$url&uuid=$uuid'>Show content</a></div></div>";
           }
           else {
             $url_output = $info['code'];
