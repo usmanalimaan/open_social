@@ -150,6 +150,7 @@ class SocialGroupSettings extends ConfigFormBase {
       '#description' => $this->t('Enable cross-group posting for node types'),
       '#options' => $this->getCrossPostingEntityTypesOptions(),
       '#default_value' => $config->get('cross_posting.content_types') ?? [],
+      '#required' => TRUE,
       '#states' => [
         'visible' => [
           ':input[name="cross_posting[status]"]' => ['checked' => TRUE],
@@ -170,6 +171,7 @@ class SocialGroupSettings extends ConfigFormBase {
       ),
       '#options' => $this->getGroupTypesOptions(),
       '#default_value' => $config->get('cross_posting.group_types') ?? [],
+      '#required' => TRUE,
       '#states' => [
         'visible' => [
           ':input[name="cross_posting[status]"]' => ['checked' => TRUE],
